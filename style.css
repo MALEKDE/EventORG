@@ -1,0 +1,43 @@
+body {
+    margin: 0;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.navbar {
+    background-color: #333;
+    overflow: hidden;
+}
+
+.navbar button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    cursor: pointer;
+    float: left;
+    font-size: 16px;
+}
+
+.navbar button:hover {
+    background-color: #e30f0f;
+}
+
+.navbar button.active {
+    background-color: #00ccff;
+}
+
+.tabcontent {
+    display: none;
+    padding: 20px;
+    
+}
+
+#table {
+
+    background-color: rgb(110, 255, 146);
+    border-color: black;
+    border-radius: 50px;
+    border-width: 10px;
+    align-items: center;
+}
+
