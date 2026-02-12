@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Venues | Najah Events</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="venues.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav id="mainNav" class="navbar navbar-expand-lg fixed-top navbar-dark bg-transparent">
+    <div class="container">
+      <a class="navbar-brand fw-bold gradient-text" href="index.html">Najah Events</a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item"><a class="nav-link" href="events.html">Events</a></li>
+          <li class="nav-item"><a class="nav-link active" href="venues.html">Venues</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#testimonials">Reviews</a></li>
+
+          <li class="nav-item ms-lg-3">
+            <button id="themeToggle" class="btn btn-outline-light btn-sm" aria-label="Toggle theme">
+              <i class="bi bi-moon-fill"></i>
+            </button>
+          </li>
+
+          <li class="nav-item ms-lg-2">
+            <button class="btn btn-primary btn-sm">Login</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="page-hero text-white">
+    <div class="container">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+          <span class="badge badge-glow mb-3">
+            <i class="bi bi-geo-alt me-1"></i> An-Najah National University
+          </span>
+          <h1 class="fw-bold display-6 mb-2">Venues & Spaces</h1>
+          <p class="lead mb-0">
+            Find the perfect space for your expo, club event, workshop, or conference — with capacity, facilities, and availability.
+          </p>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="hero-card p-3 p-md-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <div class="fw-semibold"><i class="bi bi-lightning-charge me-2"></i>Quick insights</div>
+              <span class="pill"><i class="bi bi-shield-check me-1"></i>Verified</span>
+            </div>
+            <div class="row g-3">
+              <div class="col-4">
+                <div class="kpi">
+                  <div class="kpi-num" id="kpiTotal">0</div>
+                  <div class="kpi-label">Venues</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="kpi">
+                  <div class="kpi-num" id="kpiAvailable">0</div>
+                  <div class="kpi-label">Available</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="kpi">
+                  <div class="kpi-num" id="kpiSeats">0</div>
+                  <div class="kpi-label">Max seats</div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-3 soft-hr">
+
+            <div class="d-flex gap-2">
+              <a href="#list" class="btn btn-light flex-grow-1">
+                <i class="bi bi-search me-2"></i>Browse venues
+              </a>
+              <button class="btn btn-outline-light" id="openHelp">
+                <i class="bi bi-info-circle"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Filters -->
+  <section id="list" class="py-4">
+    <div class="container">
+      <div class="filter-bar p-3 p-lg-4">
+        <div class="row g-3 align-items-center">
+          <div class="col-lg-5">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="searchInput" type="text" class="form-control" placeholder="Search (name, building, features)..." />
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-lg-2">
+            <select id="typeSelect" class="form-select">
+              <option value="all" selected>All types</option>
+              <option value="auditorium">Auditorium</option>
+              <option value="hall">Hall</option>
+              <option value="classroom">Classroom</option>
+              <option value="outdoor">Outdoor</option>
+              <option value="lab">Lab</option>
+            </select>
+          </div>
+
+          <div class="col-sm-6 col-lg-2">
+            <select id="availabilitySelect" class="form-select">
+              <option value="all" selected>Any status</option>
+              <option value="available">Available</option>
+              <option value="busy">Busy</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+          </div>
+
+          <div class="col-sm-6 col-lg-2">
+            <select id="sortSelect" class="form-select">
+              <option value="recommended" selected>Sort: Recommended</option>
+              <option value="capacity_desc">Capacity: High → Low</option>
+              <option value="capacity_asc">Capacity: Low → High</option>
+              <option value="name_asc">Name: A → Z</option>
+            </select>
+          </div>
+
+          <div class="col-sm-6 col-lg-1 text-lg-end">
+            <button id="clearBtn" class="btn btn-outline-primary w-100">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+
+          <div class="col-12 d-flex flex-wrap gap-2 align-items-center">
+            <div class="small text-muted" id="resultCount"></div>
+
+            <div class="ms-auto d-flex flex-wrap gap-2 align-items-center">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="onlyAvailable">
+                <label class="form-check-label small" for="onlyAvailable">Only available</label>
+              </div>
+
+              <div class="input-group input-group-sm capacity-group">
+                <span class="input-group-text"><i class="bi bi-people"></i></span>
+                <input id="minCapacity" type="number" class="form-control" placeholder="Min capacity" min="0">
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cards Grid -->
+  <section class="pb-5">
+    <div class="container">
+      <div id="venuesGrid" class="row g-4"></div>
+
+      <div class="text-center mt-5">
+        <button id="loadMoreBtn" class="btn btn-primary btn-lg px-5">
+          Load more
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Details Modal -->
+  <div class="modal fade" id="venueModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content modal-soft">
+        <div class="modal-header border-0">
+          <div>
+            <h5 class="modal-title fw-bold" id="modalTitle">Venue</h5>
+            <div class="small text-muted" id="modalSubtitle"></div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body pt-0">
+          <img id="modalImg" class="w-100 rounded-4 mb-3 modal-img" alt="Venue image">
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="info-box">
+                <div class="info-label"><i class="bi bi-people me-1"></i>Capacity</div>
+                <div class="info-value" id="modalCapacity"></div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="info-box">
+                <div class="info-label"><i class="bi bi-aspect-ratio me-1"></i>Area</div>
+                <div class="info-value" id="modalArea"></div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="info-box">
+                <div class="info-label"><i class="bi bi-check2-circle me-1"></i>Status</div>
+                <div class="info-value" id="modalStatus"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <div class="fw-semibold mb-2">Facilities</div>
+            <div id="modalFeatures" class="d-flex flex-wrap gap-2"></div>
+          </div>
+
+          <div class="mt-3">
+            <div class="fw-semibold mb-2">Notes</div>
+            <p class="text-muted mb-0" id="modalNotes"></p>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0">
+          <button class="btn btn-outline-primary" data-bs-dismiss="modal">
+            Close
+          </button>
+          <button id="bookNowBtn" class="btn btn-primary">
+            <i class="bi bi-calendar2-check me-2"></i>Book now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tiny Help Modal -->
+  <div class="modal fade" id="helpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-soft">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold">How booking works</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0 text-muted">
+          <ul class="mb-0">
+            <li>Pick a venue, check its capacity and facilities.</li>
+            <li>Click <b>Book now</b> (later you’ll connect it to a booking form + calendar).</li>
+            <li>Use filters to quickly find available spaces.</li>
+          </ul>
+        </div>
+        <div class="modal-footer border-0">
+          <button class="btn btn-primary" data-bs-dismiss="modal">Got it</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center py-4 bg-dark text-white">
+    © 2026 An-Najah National University — Event Platform
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ====== Data (replace later with backend/API) ======
+    const VENUES = [
+      {
+        id: 1,
+        name: "Main Auditorium",
+        building: "Main Campus",
+        type: "auditorium",
+        capacity: 800,
+        area: "1,200 m²",
+        status: "available",
+        image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1400&q=80",
+        features: ["Stage", "Sound system", "Projector", "Backstage", "AC"],
+        notes: "Ideal for large conferences, keynote talks, and official ceremonies."
+      },
+      {
+        id: 2,
+        name: "Engineering Hall",
+        building: "Engineering Faculty",
+        type: "hall",
+        capacity: 350,
+        area: "650 m²",
+        status: "busy",
+        image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80",
+        features: ["Projector", "Wi-Fi", "Sound system", "Seating"],
+        notes: "Great for tech talks, exhibitions, and mid-size community events."
+      },
+      {
+        id: 3,
+        name: "Expo Hall",
+        building: "Student Activities Center",
+        type: "hall",
+        capacity: 600,
+        area: "980 m²",
+        status: "available",
+        image: "https://images.unsplash.com/photo-1515169067868-5387ec356754?auto=format&fit=crop&w=1400&q=80",
+        features: ["Booths", "Power outlets", "Wi-Fi", "Open space"],
+        notes: "Best for expos with booths — companies, projects fairs, and showcases."
+      },
+      {
+        id: 4,
+        name: "Outdoor Stage",
+        building: "Central Yard",
+        type: "outdoor",
+        capacity: 1200,
+        area: "Open area",
+        status: "available",
+        image: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1400&q=80",
+        features: ["Stage", "Lighting", "Outdoor seating", "Security"],
+        notes: "Perfect for festivals, graduation vibes, and large student gatherings."
+      },
+      {
+        id: 5,
+        name: "Workshop Room A",
+        building: "Library Building",
+        type: "classroom",
+        capacity: 60,
+        area: "110 m²",
+        status: "maintenance",
+        image: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1400&q=80",
+        features: ["Whiteboard", "Projector", "Wi-Fi"],
+        notes: "Small workshops and training. Currently under maintenance."
+      },
+      {
+        id: 6,
+        name: "Computer Lab 2",
+        building: "IT Center",
+        type: "lab",
+        capacity: 40,
+        area: "95 m²",
+        status: "available",
+        image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1400&q=80",
+        features: ["Computers", "High-speed internet", "Projector", "AC"],
+        notes: "Hands-on sessions: coding workshops, testing demos, and hack activities."
+      }
+    ];
+
+    // ====== Elements ======
+    const grid = document.getElementById("venuesGrid");
+    const searchInput = document.getElementById("searchInput");
+    const typeSelect = document.getElementById("typeSelect");
+    const availabilitySelect = document.getElementById("availabilitySelect");
+    const sortSelect = document.getElementById("sortSelect");
+    const resultCount = document.getElementById("resultCount");
+    const onlyAvailable = document.getElementById("onlyAvailable");
+    const minCapacity = document.getElementById("minCapacity");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    // KPIs
+    const kpiTotal = document.getElementById("kpiTotal");
+    const kpiAvailable = document.getElementById("kpiAvailable");
+    const kpiSeats = document.getElementById("kpiSeats");
+
+    // Navbar scroll
+    const nav = document.getElementById("mainNav");
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 10) nav.classList.add("scrolled");
+      else nav.classList.remove("scrolled");
+    });
+
+    // Dark mode (same as your theme)
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+    });
+
+    // Help modal
+    const helpModal = new bootstrap.Modal(document.getElementById("helpModal"));
+    document.getElementById("openHelp").addEventListener("click", () => helpModal.show());
+
+    // Details modal
+    const venueModalEl = document.getElementById("venueModal");
+    const venueModal = new bootstrap.Modal(venueModalEl);
+
+    const modalTitle = document.getElementById("modalTitle");
+    const modalSubtitle = document.getElementById("modalSubtitle");
+    const modalImg = document.getElementById("modalImg");
+    const modalCapacity = document.getElementById("modalCapacity");
+    const modalArea = document.getElementById("modalArea");
+    const modalStatus = document.getElementById("modalStatus");
+    const modalFeatures = document.getElementById("modalFeatures");
+    const modalNotes = document.getElementById("modalNotes");
+    const bookNowBtn = document.getElementById("bookNowBtn");
+
+    // Pagination
+    let pageSize = 6;
+    let currentShown = 0;
+    let currentList = [...VENUES];
+
+    // ====== Helpers ======
+    function statusBadge(status){
+      if(status === "available") return `<span class="badge badge-available"><i class="bi bi-check-circle me-1"></i>Available</span>`;
+      if(status === "busy") return `<span class="badge badge-busy"><i class="bi bi-clock-history me-1"></i>Busy</span>`;
+      return `<span class="badge badge-maint"><i class="bi bi-tools me-1"></i>Maintenance</span>`;
+    }
+
+    function typeLabel(type){
+      const map = {auditorium:"Auditorium", hall:"Hall", classroom:"Classroom", outdoor:"Outdoor", lab:"Lab"};
+      return map[type] || "Venue";
+    }
+
+    function featureChip(text){
+      return `<span class="chip"><i class="bi bi-check2 me-1"></i>${text}</span>`;
+    }
+
+    function matchesFilters(v){
+      const q = searchInput.value.trim().toLowerCase();
+      const type = typeSelect.value;
+      const av = availabilitySelect.value;
+      const minCap = parseInt(minCapacity.value || "0", 10);
+
+      const hay = (v.name + " " + v.building + " " + v.features.join(" ")).toLowerCase();
+
+      if(q && !hay.includes(q)) return false;
+      if(type !== "all" && v.type !== type) return false;
+      if(av !== "all" && v.status !== av) return false;
+      if(onlyAvailable.checked && v.status !== "available") return false;
+      if(minCap && v.capacity < minCap) return false;
+
+      return true;
+    }
+
+    function sortList(list){
+      const s = sortSelect.value;
+      const out = [...list];
+      if(s === "capacity_desc") out.sort((a,b)=>b.capacity - a.capacity);
+      else if(s === "capacity_asc") out.sort((a,b)=>a.capacity - b.capacity);
+      else if(s === "name_asc") out.sort((a,b)=>a.name.localeCompare(b.name));
+      else {
+        // recommended: available first, then capacity desc
+        out.sort((a,b)=>{
+          const avA = a.status === "available" ? 1 : 0;
+          const avB = b.status === "available" ? 1 : 0;
+          if(avB !== avA) return avB - avA;
+          return b.capacity - a.capacity;
+        });
+      }
+      return out;
+    }
+
+    function renderCard(v){
+      const chips = v.features.slice(0,3).map(featureChip).join("");
+      const more = v.features.length > 3 ? `<span class="chip chip-muted">+${v.features.length-3} more</span>` : "";
+      const disabled = v.status !== "available" ? "disabled" : "";
+
+      return `
+        <div class="col-md-6 col-lg-4">
+          <div class="card venue-card h-100">
+            <div class="img-wrap">
+              <img src="${v.image}" class="card-img-top" alt="${v.name}">
+              <div class="img-overlay d-flex justify-content-between align-items-start">
+                <span class="badge badge-type">${typeLabel(v.type)}</span>
+                ${statusBadge(v.status)}
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between gap-2">
+                <div>
+                  <h5 class="card-title mb-1">${v.name}</h5>
+                  <div class="text-muted small"><i class="bi bi-building me-1"></i>${v.building}</div>
+                </div>
+                <div class="capacity-pill">
+                  <i class="bi bi-people me-1"></i>${v.capacity}
+                </div>
+              </div>
+
+              <div class="mt-3 d-flex flex-wrap gap-2">
+                ${chips}${more}
+              </div>
+
+              <div class="mt-3 d-flex gap-2 card-actions">
+                <button class="btn btn-outline-primary w-50" data-action="details" data-id="${v.id}">
+                  <i class="bi bi-eye me-2"></i>Details
+                </button>
+                <button class="btn btn-primary w-50" data-action="book" data-id="${v.id}" ${disabled}>
+                  <i class="bi bi-calendar2-check me-2"></i>Book
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateKPIs(){
+      const total = VENUES.length;
+      const available = VENUES.filter(v=>v.status==="available").length;
+      const maxSeats = Math.max(...VENUES.map(v=>v.capacity));
+
+      kpiTotal.textContent = total;
+      kpiAvailable.textContent = available;
+      kpiSeats.textContent = maxSeats;
+    }
+
+    function applyAndRender(reset=false){
+      const filtered = VENUES.filter(matchesFilters);
+      const sorted = sortList(filtered);
+
+      currentList = sorted;
+      if(reset){
+        currentShown = 0;
+        grid.innerHTML = "";
+      }
+
+      const toShow = currentList.slice(currentShown, currentShown + pageSize);
+      grid.insertAdjacentHTML("beforeend", toShow.map(renderCard).join(""));
+      currentShown += toShow.length;
+
+      resultCount.textContent = `${filtered.length} venue(s) found`;
+      loadMoreBtn.style.display = currentShown >= currentList.length ? "none" : "inline-block";
+    }
+
+    function openDetails(id){
+      const v = VENUES.find(x=>x.id===id);
+      if(!v) return;
+
+      modalTitle.textContent = v.name;
+      modalSubtitle.textContent = `${typeLabel(v.type)} • ${v.building}`;
+      modalImg.src = v.image;
+      modalCapacity.textContent = `${v.capacity} seats`;
+      modalArea.textContent = v.area;
+      modalStatus.innerHTML = statusBadge(v.status);
+
+      modalFeatures.innerHTML = v.features.map(f => `<span class="chip"><i class="bi bi-stars me-1"></i>${f}</span>`).join("");
+      modalNotes.textContent = v.notes;
+
+      bookNowBtn.disabled = v.status !== "available";
+      bookNowBtn.onclick = () => alert(`Booking started for: ${v.name} (connect later to your booking form)`);
+
+      venueModal.show();
+    }
+
+    function bookNow(id){
+      const v = VENUES.find(x=>x.id===id);
+      if(!v) return;
+      if(v.status !== "available") return;
+      alert(`Booking started for: ${v.name} (connect later to your booking form)`);
+    }
+
+    // Grid click delegation
+    grid.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if(!btn) return;
+      const id = parseInt(btn.getAttribute("data-id"), 10);
+      const action = btn.getAttribute("data-action");
+      if(action === "details") openDetails(id);
+      if(action === "book") bookNow(id);
+    });
+
+    // Events
+    [searchInput, typeSelect, availabilitySelect, sortSelect, onlyAvailable, minCapacity].forEach(el=>{
+      el.addEventListener("input", () => applyAndRender(true));
+      el.addEventListener("change", () => applyAndRender(true));
+    });
+
+    loadMoreBtn.addEventListener("click", () => applyAndRender(false));
+
+    clearBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      typeSelect.value = "all";
+      availabilitySelect.value = "all";
+      sortSelect.value = "recommended";
+      onlyAvailable.checked = false;
+      minCapacity.value = "";
+      applyAndRender(true);
+    });
+
+    // Init
+    updateKPIs();
+    applyAndRender(true);
+  </script>
+</body>
+</html>
