@@ -1,0 +1,66 @@
+body{
+  font-family:'Poppins',sans-serif;
+  transition:0.3s;
+}
+
+.gradient-text{
+  background:linear-gradient(90deg,#4f46e5,#06b6d4);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.page-hero{
+  padding: 120px 0 50px;
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+}
+
+/* Navbar background when scroll */
+.navbar.scrolled{
+  background: rgba(0,0,0,0.75) !important;
+  backdrop-filter: blur(10px);
+}
+
+.event-card{
+  transition:0.4s;
+  border: none;
+  overflow: hidden;
+  border-radius: 18px;
+}
+.event-card:hover{
+  transform:translateY(-10px);
+  box-shadow:0 15px 40px rgba(0,0,0,0.2);
+}
+
+.card-img-top{
+  height:220px;
+  object-fit:cover;
+}
+
+.badge-soft{
+  background: rgba(79,70,229,0.12);
+  color: #4f46e5;
+  border: 1px solid rgba(79,70,229,0.25);
+}
+
+/* Dark Mode */
+.dark-mode{
+  background:#121212;
+  color:white;
+}
+.dark-mode .navbar.scrolled{
+  background: rgba(20,20,20,0.85) !important;
+}
+.dark-mode .form-control,
+.dark-mode .form-select,
+.dark-mode .input-group-text{
+  background:#1e1e1e;
+  color:white;
+  border-color:#2a2a2a;
+}
+.dark-mode .card{
+  background:#1e1e1e;
+  color:white;
+}
+.dark-mode .text-muted{
+  color:#bdbdbd !important;
+}
