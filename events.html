@@ -1,143 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Events | Najah Events</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events | Najah Events</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
 
-<style>
-body{font-family:Poppins,sans-serif}
-.page-header{
-padding:120px 0 60px;
-background:linear-gradient(135deg,#4f46e5,#06b6d4);
-color:white;
-}
-.gradient-text{
-background:linear-gradient(90deg,#4f46e5,#06b6d4);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-}
-.event-card:hover{
-transform:translateY(-8px);
-transition:.3s;
-}
-.navbar.scrolled{background:rgba(0,0,0,0.8)!important}
-</style>
-
+  <link rel="stylesheet" href="events.css" />
 </head>
-
 <body>
 
-<!-- NAVBAR (SAME AS HOME, ONLY ACTIVE CHANGED) -->
-<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-transparent">
-<div class="container">
-<a class="navbar-brand fw-bold gradient-text" href="index.html">Najah Events</a>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-transparent">
+    <div class="container">
+      <a class="navbar-brand fw-bold gradient-text" href="index.html">Najah Events</a>
 
-<button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu">
-<span class="navbar-toggler-icon"></span>
-</button>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-<div class="collapse navbar-collapse" id="navMenu">
-<ul class="navbar-nav ms-auto align-items-lg-center">
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item"><a class="nav-link active" href="events.html">Events</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#venues">Venues</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#testimonials">Reviews</a></li>
 
-<li class="nav-item">
-<a class="nav-link" href="index.html">Home</a>
-</li>
+          <li class="nav-item ms-lg-3">
+            <button id="themeToggle" class="btn btn-outline-light btn-sm" aria-label="Toggle theme">
+              <i class="bi bi-moon-fill"></i>
+            </button>
+          </li>
 
-<li class="nav-item">
-<a class="nav-link active" href="events.html">Events</a>
-</li>
+          <li class="nav-item ms-lg-2">
+            <button class="btn btn-primary btn-sm">Login</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-<li class="nav-item">
-<a class="nav-link" href="#">Venues</a>
-</li>
+  <!-- Header -->
+  <header class="page-hero text-white">
+    <div class="container text-center">
+      <h1 class="fw-bold mb-2">All Events</h1>
+      <p class="lead mb-0">Explore upcoming events and register in seconds.</p>
+    </div>
+  </header>
 
-<li class="nav-item ms-lg-3">
-<button class="btn btn-outline-light btn-sm">
-<i class="bi bi-moon-fill"></i>
-</button>
-</li>
+  <!-- Filters -->
+  <section class="py-4">
+    <div class="container">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input id="searchInput" type="text" class="form-control" placeholder="Search events (name, venue, date)..." />
+          </div>
+        </div>
 
-<li class="nav-item ms-lg-2">
-<button class="btn btn-primary btn-sm">Login</button>
-</li>
+        <div class="col-md-3">
+          <select id="categorySelect" class="form-select">
+            <option value="all" selected>All categories</option>
+            <option value="expo">Expo</option>
+            <option value="conference">Conference</option>
+            <option value="workshop">Workshop</option>
+            <option value="festival">Festival</option>
+          </select>
+        </div>
 
-</ul>
-</div>
-</div>
-</nav>
+        <div class="col-md-3 text-md-end">
+          <span id="resultCount" class="text-muted small"></span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<!-- HEADER -->
-<section class="page-header text-center">
-<div class="container">
-<h1 class="fw-bold">All Events</h1>
-<p class="lead">Browse and register to upcoming events</p>
-</div>
-</section>
+  <!-- Events Grid -->
+  <section class="pb-5">
+    <div class="container">
+      <div id="eventsGrid" class="row g-4"></div>
 
-<!-- EVENTS GRID -->
-<section class="py-5">
-<div class="container">
-<div class="row g-4">
+      <div class="text-center mt-5">
+        <button id="loadMoreBtn" class="btn btn-primary btn-lg px-5">
+          Load more
+        </button>
+      </div>
+    </div>
+  </section>
 
-<div class="col-md-4">
-<div class="card event-card">
-<img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=60" class="card-img-top">
-<div class="card-body">
-<h5>Career Expo 2026</h5>
-<p>Main Hall — March 12</p>
-<button class="btn btn-primary w-100">Register</button>
-</div>
-</div>
-</div>
+  <!-- Footer -->
+  <footer class="text-center py-4 bg-dark text-white">
+    © 2026 An-Najah National University — Event Platform
+  </footer>
 
-<div class="col-md-4">
-<div class="card event-card">
-<img src="https://images.unsplash.com/photo-1558008258-3256797b43f3?auto=format&fit=crop&w=800&q=60" class="card-img-top">
-<div class="card-body">
-<h5>Tech Conference</h5>
-<p>Engineering Hall — April 5</p>
-<button class="btn btn-primary w-100">Register</button>
-</div>
-</div>
-</div>
-
-<div class="col-md-4">
-<div class="card event-card">
-<img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=800&q=60" class="card-img-top">
-<div class="card-body">
-<h5>Projects Fair</h5>
-<p>Expo Hall — May 1</p>
-<button class="btn btn-primary w-100">Register</button>
-</div>
-</div>
-</div>
-
-</div>
-
-<div class="text-center mt-5">
-<button class="btn btn-primary btn-lg">Load More</button>
-</div>
-
-</div>
-</section>
-
-<footer class="text-center py-4 bg-dark text-white">
-© 2026 An-Najah National University — Event Platform
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-window.addEventListener("scroll",()=>{
-document.querySelector(".navbar")
-.classList.toggle("scrolled",window.scrollY>40);
-});
-</script>
-
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="events.js"></script>
 </body>
 </html>
