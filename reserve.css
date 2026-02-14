@@ -1,0 +1,137 @@
+body{
+  font-family:'Poppins',sans-serif;
+  transition:0.3s;
+}
+
+.gradient-text{
+  background:linear-gradient(90deg,#4f46e5,#06b6d4);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.page-hero{
+  padding: 120px 0 55px;
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+}
+
+.navbar.scrolled{
+  background: rgba(0,0,0,0.75) !important;
+  backdrop-filter: blur(10px);
+}
+
+.glass-card{
+  border: none;
+  border-radius: 18px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+}
+
+/* Map */
+.map-wrap{
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.venue-img{
+  width: 100%;
+  height: 440px;
+  object-fit: cover;
+  display:block;
+}
+
+.slots-layer{
+  position:absolute;
+  inset:0;
+}
+
+/* Slots */
+.slot{
+  position:absolute;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size: 12px;
+  user-select:none;
+  transition: 0.2s;
+}
+
+/* 🟢 Available */
+.slot.available{
+  background: rgba(34,197,94,0.75);
+}
+
+/* 🔴 Reserved (Approved by Admin) */
+.slot.reserved{
+  background: rgba(239,68,68,0.78);
+  cursor:not-allowed;
+}
+
+/* 🔵 Pending (Request Sent) */
+.slot.pending{
+  background: rgba(59,130,246,0.85);
+  cursor:not-allowed;
+}
+
+/* 🔵 Selected (Temporary before sending request) */
+.slot.selected{
+  outline: 3px solid rgba(59,130,246,0.95);
+  transform: scale(1.03);
+}
+
+/* Legend */
+.legend-item{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.04);
+}
+
+.dot{
+  width:12px;
+  height:12px;
+  border-radius: 50%;
+}
+
+.dot-available{ background: rgb(34,197,94); }
+.dot-reserved{ background: rgb(239,68,68); }
+
+/* NEW — Pending Dot */
+.dot-pending{ background: rgb(59,130,246); }
+
+/* Dark Mode */
+.dark-mode{
+  background:#121212;
+  color:white;
+}
+
+.dark-mode .navbar.scrolled{
+  background: rgba(20,20,20,0.85) !important;
+}
+
+.dark-mode .glass-card{
+  background:#1e1e1e;
+  color:white;
+}
+
+.dark-mode .form-control,
+.dark-mode .form-select{
+  background:#161616;
+  color:white;
+  border-color:#2a2a2a;
+}
+
+.dark-mode .legend-item{
+  background: rgba(255,255,255,0.06);
+}
+
+.dark-mode .map-wrap{
+  border-color: rgba(255,255,255,0.12);
+}

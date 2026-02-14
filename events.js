@@ -1,6 +1,10 @@
+// These are the ONLY event IDs supported by your reserve.js
+const supportedReserveEvents = new Set(["career-expo", "tech-conf", "projects-fair"]);
+
 // Demo events data (later replace with backend API)
 const allEvents = [
   {
+    id: "career-expo",
     title: "Career Expo 2026",
     venue: "Main Hall",
     date: "2026-03-12",
@@ -8,6 +12,7 @@ const allEvents = [
     img: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=60"
   },
   {
+    id: "tech-conf",
     title: "Tech Conference",
     venue: "Engineering Hall",
     date: "2026-04-05",
@@ -15,13 +20,17 @@ const allEvents = [
     img: "https://images.unsplash.com/photo-1558008258-3256797b43f3?auto=format&fit=crop&w=1200&q=60"
   },
   {
+    id: "projects-fair",
     title: "Projects Fair",
     venue: "Expo Hall",
     date: "2026-05-01",
     category: "expo",
     img: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1200&q=60"
   },
+
+  // Other demo events (not connected to reserve page yet)
   {
+    id: "startup-pitch",
     title: "Startup Pitch Night",
     venue: "Business Center",
     date: "2026-03-22",
@@ -29,6 +38,7 @@ const allEvents = [
     img: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=60"
   },
   {
+    id: "ai-workshop",
     title: "AI Workshop",
     venue: "Lab A2",
     date: "2026-04-14",
@@ -36,14 +46,15 @@ const allEvents = [
     img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=60"
   },
   {
+    id: "spring-festival",
     title: "Spring Festival",
     venue: "Outdoor Stage",
     date: "2026-04-20",
     category: "festival",
     img: "https://images.unsplash.com/photo-1515165562835-c3b8b0b5f3ff?auto=format&fit=crop&w=1200&q=60"
   },
-  // Add more demo events so "Load more" makes sense
   {
+    id: "cyber-day",
     title: "Cybersecurity Day",
     venue: "IT Building",
     date: "2026-05-10",
@@ -51,6 +62,7 @@ const allEvents = [
     img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=60"
   },
   {
+    id: "robotics-showcase",
     title: "Robotics Showcase",
     venue: "Engineering Hall",
     date: "2026-05-18",
@@ -58,6 +70,7 @@ const allEvents = [
     img: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1200&q=60"
   },
   {
+    id: "design-thinking",
     title: "Design Thinking Workshop",
     venue: "Innovation Hub",
     date: "2026-06-02",
@@ -65,6 +78,7 @@ const allEvents = [
     img: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=60"
   },
   {
+    id: "summer-culture",
     title: "Summer Culture Night",
     venue: "Main Auditorium",
     date: "2026-06-15",
@@ -102,6 +116,24 @@ function getFilteredEvents(){
   });
 }
 
+function renderRegisterButton(ev){
+  // Only show real register link for supported events
+  if (supportedReserveEvents.has(ev.id)){
+    return `
+      <a href="reserve.html?event=${encodeURIComponent(ev.id)}" class="btn btn-primary w-100">
+        Register
+      </a>
+    `;
+  }
+
+  // Not supported yet
+  return `
+    <button class="btn btn-outline-secondary w-100" disabled title="Reservation not available yet">
+      Coming soon
+    </button>
+  `;
+}
+
 function render(){
   const filtered = getFilteredEvents();
   const toShow = filtered.slice(0, visibleCount);
@@ -118,7 +150,7 @@ function render(){
           <h5 class="card-title">${ev.title}</h5>
           <p class="text-muted mb-3"><i class="bi bi-geo-alt"></i> ${ev.venue}</p>
           <div class="mt-auto">
-            <button class="btn btn-primary w-100">Register</button>
+            ${renderRegisterButton(ev)}
           </div>
         </div>
       </div>
@@ -127,7 +159,6 @@ function render(){
 
   resultCount.textContent = `${filtered.length} event(s) found`;
 
-  // Hide load more if nothing more
   loadMoreBtn.style.display = (visibleCount >= filtered.length) ? "none" : "inline-block";
 }
 
