@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<script>document.documentElement.setAttribute("data-theme",localStorage.getItem("najah_theme")||"dark");</script>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Venues — Najah Events</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="venues.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand gradient-text" href="index.html"><span style="font-size:1.1rem;">◆</span> Najah Events</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav mx-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="events.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link active" href="venues.html">Venues</a></li>
+        <li class="nav-item"><a class="nav-link" href="clubs.html">Clubs</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      </ul>
+      <ul class="navbar-nav align-items-lg-center gap-1" id="navUserSlot"></ul>
+    </div>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <div class="section-label mb-2"><i class="bi bi-building me-1"></i> Venues</div>
+        <h1 class="section-title" style="font-size:clamp(2rem,4vw,3rem);">Campus Spaces &amp; Venues</h1>
+        <p style="color:var(--text-muted);margin-top:0.5rem;">Find the perfect space for your event — browse by type, capacity, and availability.</p>
+      </div>
+      <div class="col-lg-5">
+        <div class="glass-panel p-3 p-md-4">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span style="font-size:0.8rem;font-weight:600;color:var(--text-secondary)"><i class="bi bi-lightning-charge me-1" style="color:var(--gold)"></i>Quick Insights</span>
+            <span class="badge-gold"><i class="bi bi-shield-check me-1"></i>Verified</span>
+          </div>
+          <div class="row g-3">
+            <div class="col-4 text-center"><div class="stat-num" id="kpiTotal" style="font-size:2rem;">0</div><div class="stat-label">Total</div></div>
+            <div class="col-4 text-center"><div class="stat-num" id="kpiAvail" style="font-size:2rem;color:#34d399;">0</div><div class="stat-label">Available</div></div>
+            <div class="col-4 text-center"><div class="stat-num" id="kpiSeats" style="font-size:2rem;">0</div><div class="stat-label">Max Seats</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="section-py-sm">
+  <div class="container">
+    <div class="filter-bar-v glass-panel p-3 p-lg-4 mb-5">
+      <div class="row g-3 align-items-center">
+        <div class="col-lg-4">
+          <div class="input-group-dark"><i class="bi bi-search ig-icon"></i><input id="searchInput" type="text" class="form-control-dark" placeholder="Search venues, buildings, features…" style="padding-left:2.5rem;"></div>
+        </div>
+        <div class="col-sm-6 col-lg-2"><select id="typeSelect" class="form-select-dark"><option value="all">All Types</option><option value="auditorium">Auditorium</option><option value="hall">Hall</option><option value="classroom">Classroom</option><option value="outdoor">Outdoor</option><option value="lab">Lab</option></select></div>
+        <div class="col-sm-6 col-lg-2"><select id="availSelect" class="form-select-dark"><option value="all">Any Status</option><option value="available">Available</option><option value="busy">Busy</option><option value="maintenance">Maintenance</option></select></div>
+        <div class="col-sm-6 col-lg-2"><select id="sortSelect" class="form-select-dark"><option value="recommended">Recommended</option><option value="cap_desc">Capacity ↓</option><option value="cap_asc">Capacity ↑</option><option value="name">Name A-Z</option></select></div>
+        <div class="col-sm-6 col-lg-1"><button id="clearBtn" class="btn-ghost w-100 justify-content-center"><i class="bi bi-x-lg"></i></button></div>
+        <div class="col-12 d-flex flex-wrap gap-3 align-items-center" style="border-top:1px solid var(--border-subtle);padding-top:0.85rem;">
+          <span id="resultCount" style="font-size:0.78rem;color:var(--text-muted);"></span>
+          <div class="ms-auto d-flex gap-3 align-items-center">
+            <label class="d-flex align-items-center gap-2" style="font-size:0.8rem;color:var(--text-secondary);cursor:pointer;">
+              <input type="checkbox" id="onlyAvail" style="accent-color:var(--gold);"> Only available
+            </label>
+            <div class="input-group-dark" style="width:170px;"><i class="bi bi-people ig-icon"></i><input id="minCap" type="number" class="form-control-dark" placeholder="Min capacity" style="padding-left:2.3rem;" min="0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="venuesGrid" class="row g-4"></div>
+    <div class="text-center mt-5"><button id="loadMoreBtn" class="btn-outline-gold" style="display:none;">Load More <i class="bi bi-arrow-down ms-1"></i></button></div>
+    <div id="emptyState" class="empty-state" style="display:none;"><i class="bi bi-building-slash"></i><h5 style="color:var(--text-secondary);font-family:var(--font-display);">No venues found</h5><p>Try different filters.</p></div>
+  </div>
+</section>
+
+<!-- Venue Detail Modal -->
+<div class="modal fade modal-dark" id="venueModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header"><div><h5 class="modal-title fw-bold" style="font-family:var(--font-display);" id="mTitle"></h5><div style="font-size:0.8rem;color:var(--text-muted);" id="mSub"></div></div><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <img id="mImg" class="w-100 mb-4" style="border-radius:var(--radius-md);height:260px;object-fit:cover;" alt="">
+        <div class="row g-3 mb-4">
+          <div class="col-4"><div class="glass-panel p-3 text-center"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.35rem;"><i class="bi bi-people me-1"></i>Capacity</div><div style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--gold);" id="mCap"></div></div></div>
+          <div class="col-4"><div class="glass-panel p-3 text-center"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.35rem;"><i class="bi bi-aspect-ratio me-1"></i>Area</div><div style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;" id="mArea"></div></div></div>
+          <div class="col-4"><div class="glass-panel p-3 text-center"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.35rem;"><i class="bi bi-check2-circle me-1"></i>Status</div><div id="mStatus" class="mt-1"></div></div></div>
+        </div>
+        <div class="mb-3"><div style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.6rem;">Facilities</div><div id="mFeatures" class="d-flex flex-wrap gap-2"></div></div>
+        <div><div style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem;">Notes</div><p style="font-size:0.875rem;color:var(--text-muted);" id="mNotes"></p></div>
+      </div>
+      <div class="modal-footer"><button class="btn-ghost" data-bs-dismiss="modal">Close</button><a href="reserve.html" class="btn-gold" id="mBookBtn"><i class="bi bi-calendar2-check me-1"></i> Book This Venue</a></div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-bottom" style="border-top:none;padding-top:0;"><span>© 2026 An-Najah National University — Najah Events</span><a href="index.html" style="color:var(--text-muted);text-decoration:none;">← Back to Home</a></div></div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="global.js"></script>
+<script src="venues.js"></script>
+</body>
+</html>

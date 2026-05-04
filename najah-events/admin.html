@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<script>document.documentElement.setAttribute("data-theme",localStorage.getItem("najah_theme")||"dark");</script>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel — Najah Events</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="global.css">
+  <style>
+    .admin-layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - var(--nav-height));}
+    @media(max-width:992px){.admin-layout{grid-template-columns:1fr;}}
+    .admin-sidebar{background:var(--bg-surface);border-right:1px solid var(--border-subtle);padding:1.5rem 1rem;position:sticky;top:var(--nav-height);height:calc(100vh - var(--nav-height));overflow-y:auto;}
+    @media(max-width:992px){.admin-sidebar{display:none;}}
+    .admin-main{padding:2rem 2.5rem;background:var(--bg-base);}
+    @media(max-width:768px){.admin-main{padding:1.5rem;}}
+    .s-link{display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0.9rem;border-radius:var(--radius-sm);color:var(--text-muted);text-decoration:none;font-size:0.85rem;font-weight:500;transition:var(--transition);margin-bottom:0.2rem;}
+    .s-link:hover{background:var(--bg-card);color:var(--text-primary);}
+    .s-link.active{background:var(--gold-subtle);color:var(--gold);border:1px solid var(--border);}
+    .s-link i{width:18px;text-align:center;}
+    .s-section{font-size:0.65rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);padding:1.25rem 0.9rem 0.5rem;}
+    .panel{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:1.5rem;}
+    .admin-table{width:100%;border-collapse:collapse;}
+    .admin-table th{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);padding:0.7rem 1rem;text-align:left;border-bottom:1px solid var(--border-subtle);}
+    .admin-table td{padding:0.9rem 1rem;border-bottom:1px solid var(--border-subtle);font-size:0.85rem;color:var(--text-secondary);}
+    .admin-table tr:last-child td{border-bottom:none;}
+    .admin-table tr:hover td{background:rgba(255,255,255,0.02);}
+    .action-btn{background:none;border:1px solid var(--border-subtle);border-radius:6px;padding:0.25rem 0.65rem;font-size:0.75rem;cursor:pointer;transition:var(--transition);font-family:var(--font-body);}
+    .action-approve{color:#34d399;border-color:rgba(52,211,153,0.3);}
+    .action-approve:hover{background:rgba(52,211,153,0.1);}
+    .action-reject{color:#f87171;border-color:rgba(248,113,113,0.3);}
+    .action-reject:hover{background:rgba(248,113,113,0.1);}
+    .action-view{color:var(--gold);border-color:var(--border);}
+    .action-view:hover{background:var(--gold-subtle);}
+    .mini-kpi{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1.25rem;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand gradient-text" href="index.html"><span>◆</span> Najah Events</a>
+    <div class="ms-auto d-flex align-items-center gap-2">
+      <span style="font-size:0.75rem;background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.25);padding:0.25rem 0.75rem;border-radius:100px;"><i class="bi bi-shield-check me-1"></i>Admin Mode</span>
+      <div id="navUserSlot" class="d-flex"></div>
+    </div>
+  </div>
+</nav>
+
+<div style="padding-top:var(--nav-height);">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div style="padding:0.75rem;background:linear-gradient(135deg,rgba(248,113,113,0.08),transparent);border:1px solid rgba(248,113,113,0.2);border-radius:var(--radius-md);margin-bottom:0.5rem;">
+        <div style="font-size:0.72rem;font-weight:700;color:#f87171;letter-spacing:0.08em;text-transform:uppercase;"><i class="bi bi-shield-check me-1"></i>Admin Panel</div>
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem;" id="adminName"></div>
+      </div>
+      <div class="s-section">Management</div>
+      <a href="#" class="s-link active" data-ap="overview"><i class="bi bi-grid"></i>Overview</a>
+      <a href="#" class="s-link" data-ap="bookings"><i class="bi bi-calendar2-check"></i>Booking Requests <span id="pendingBadge" style="background:var(--gold);color:#080c14;border-radius:100px;font-size:0.65rem;font-weight:700;padding:0.1rem 0.45rem;margin-left:auto;"></span></a>
+      <a href="#" class="s-link" data-ap="events"><i class="bi bi-calendar-event"></i>Events</a>
+      <a href="#" class="s-link" data-ap="venues"><i class="bi bi-building"></i>Venues</a>
+      <a href="#" class="s-link" data-ap="users"><i class="bi bi-people"></i>Users</a>
+      <div class="s-section">System</div>
+      <a href="index.html" class="s-link"><i class="bi bi-house"></i>Back to Site</a>
+      <a href="#" class="s-link" onclick="logout()"><i class="bi bi-box-arrow-right" style="color:#f87171;"></i><span style="color:#f87171;">Logout</span></a>
+    </aside>
+
+    <main class="admin-main">
+      <!-- Overview Panel -->
+      <div id="ap-overview" class="ap show">
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+          <div><h4 style="font-family:var(--font-display);font-size:1.7rem;margin-bottom:0.2rem;">Admin Dashboard</h4><p style="font-size:0.85rem;color:var(--text-muted);">Manage all platform activity from here.</p></div>
+        </div>
+        <div class="row g-3 mb-4" id="adminKpis"></div>
+
+        <!-- Recent requests -->
+        <div class="panel mb-4">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 style="font-family:var(--font-display);">Pending Booking Requests</h6>
+            <span id="pendingCount" class="badge-busy"></span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table" id="pendingTable">
+              <thead><tr><th>Ref</th><th>Event</th><th>Venue</th><th>Date</th><th>Organizer</th><th>Actions</th></tr></thead>
+              <tbody id="pendingTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Stats Chart (CSS-only bars) -->
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="panel">
+              <h6 style="font-family:var(--font-display);margin-bottom:1.25rem;">Bookings by Status</h6>
+              <div id="statusBars"></div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="panel">
+              <h6 style="font-family:var(--font-display);margin-bottom:1.25rem;">Top Venues Requested</h6>
+              <div id="venueBars"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookings Panel -->
+      <div id="ap-bookings" class="ap" style="display:none;">
+        <h4 style="font-family:var(--font-display);margin-bottom:1.5rem;">All Booking Requests</h4>
+        <div class="panel" style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Ref</th><th>Event</th><th>Venue</th><th>Date</th><th>Organizer</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="allBookingsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Events Panel -->
+      <div id="ap-events" class="ap" style="display:none;">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h4 style="font-family:var(--font-display);">Events Management</h4>
+          <button class="btn-gold" style="font-size:0.83rem;padding:0.5rem 1.25rem;" onclick="showToast('Event editor coming soon','info')"><i class="bi bi-plus me-1"></i>Add Event</button>
+        </div>
+        <div class="panel" style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Title</th><th>Category</th><th>Venue</th><th>Date</th><th>Registered</th><th>Actions</th></tr></thead>
+            <tbody id="eventsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Venues Panel -->
+      <div id="ap-venues" class="ap" style="display:none;">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h4 style="font-family:var(--font-display);">Venues Management</h4>
+          <button class="btn-gold" style="font-size:0.83rem;padding:0.5rem 1.25rem;" onclick="showToast('Venue editor coming soon','info')"><i class="bi bi-plus me-1"></i>Add Venue</button>
+        </div>
+        <div class="panel" style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Name</th><th>Type</th><th>Capacity</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="venuesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Users Panel -->
+      <div id="ap-users" class="ap" style="display:none;">
+        <h4 style="font-family:var(--font-display);margin-bottom:1.5rem;">Users</h4>
+        <div class="panel">
+          <div class="row g-3 mb-3">
+            <div class="col-md-5"><input type="text" class="form-control-dark" placeholder="Search users…" id="userSearch"></div>
+            <div class="col-md-3"><select class="form-select-dark" id="userRoleFilter"><option value="all">All Roles</option><option value="student">Students</option><option value="company">Companies</option><option value="club">Clubs</option><option value="admin">Admins</option></select></div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
+              <tbody id="usersTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="global.js"></script>
+<script>
+const user = getCurrentUser();
+if (!user || user.role !== 'admin') {
+  showToast('Admin access required', 'error');
+  setTimeout(() => window.location.href = 'login.html', 1000);
+}
+if (user) { document.getElementById('adminName').textContent = user.name || 'Admin'; }
+
+const BOOKINGS_DATA = [
+  {ref:'NE-AABB1',event:'Career Expo 2026',venue:'Main Auditorium',date:'2026-04-12',organizer:'Ahmad Khalil',email:'ahmad@najah.edu',status:'approved'},
+  {ref:'NE-BBCC2',event:'Hackathon Night',venue:'Computer Lab 2',date:'2026-04-20',organizer:'Sana Haddad',email:'sana@najah.edu',status:'pending'},
+  {ref:'NE-CCDD3',event:'Club Meeting',venue:'Workshop Room A',date:'2026-03-30',organizer:'Omar Salem',email:'omar@najah.edu',status:'rejected'},
+  {ref:'NE-DDEE4',event:'Tech Workshop',venue:'Engineering Hall',date:'2026-04-28',organizer:'Rima Khalid',email:'rima@najah.edu',status:'pending'},
+  {ref:'NE-EEFF5',event:'Spring Festival',venue:'Outdoor Stage',date:'2026-05-15',organizer:'Club Board',email:'clubs@najah.edu',status:'pending'},
+];
+const VENUES_DATA = [
+  {name:'Main Auditorium',type:'Auditorium',cap:800,status:'available'},
+  {name:'Engineering Hall',type:'Hall',cap:350,status:'busy'},
+  {name:'Expo Hall',type:'Hall',cap:600,status:'available'},
+  {name:'Outdoor Stage',type:'Outdoor',cap:1200,status:'available'},
+  {name:'Workshop Room A',type:'Classroom',cap:60,status:'maintenance'},
+  {name:'Computer Lab 2',type:'Lab',cap:40,status:'available'},
+];
+const EVENTS_DATA = [
+  {title:'Career Expo 2026',cat:'Expo',venue:'Main Auditorium',date:'Apr 12',reg:380},
+  {title:'TechTalk Summit',cat:'Conference',venue:'Engineering Hall',date:'Apr 5',reg:340},
+  {title:'Projects Fair',cat:'Workshop',venue:'Expo Hall',date:'May 1',reg:120},
+  {title:'Spring Festival',cat:'Festival',venue:'Outdoor Stage',date:'May 15',reg:650},
+];
+const USERS_DATA = [
+  {name:'Ahmad Khalil',email:'student@najah.edu',role:'student',joined:'Jan 2026'},
+  {name:'Events Admin',email:'admin@najah.edu',role:'admin',joined:'Jan 2026'},
+  {name:'Sana Haddad',email:'club@najah.edu',role:'club',joined:'Feb 2026'},
+  {name:'TechCorp HR',email:'hr@techcorp.com',role:'company',joined:'Mar 2026'},
+];
+
+// Add stored bookings
+const storedBks = JSON.parse(localStorage.getItem('najah_bookings')||'[]');
+const allBookings = [...BOOKINGS_DATA, ...storedBks.map((b,i)=>({ref:b.ref||'NE-NEW'+i,event:b.eventName||'Custom Event',venue:'TBD',date:b.date||'—',organizer:b.organizer||'User',email:b.email||'—',status:b.status||'pending'}))];
+const pending = allBookings.filter(b=>b.status==='pending');
+
+// Badges
+document.getElementById('pendingBadge').textContent = pending.length;
+document.getElementById('pendingCount').textContent = pending.length + ' pending';
+
+// KPIs
+const kpiData = [
+  {icon:'bi-calendar-event',bg:'var(--gold-subtle)',ic:'var(--gold)',val:allBookings.length,lbl:'Total Requests'},
+  {icon:'bi-clock-history',bg:'rgba(251,191,36,0.1)',ic:'#fbbf24',val:pending.length,lbl:'Pending'},
+  {icon:'bi-check-circle',bg:'rgba(52,211,153,0.1)',ic:'#34d399',val:allBookings.filter(b=>b.status==='approved').length,lbl:'Approved'},
+  {icon:'bi-x-circle',bg:'rgba(248,113,113,0.1)',ic:'#f87171',val:allBookings.filter(b=>b.status==='rejected').length,lbl:'Rejected'},
+  {icon:'bi-building',bg:'rgba(139,92,246,0.1)',ic:'#a78bfa',val:VENUES_DATA.length,lbl:'Venues'},
+  {icon:'bi-people',bg:'rgba(52,211,153,0.1)',ic:'#34d399',val:USERS_DATA.length,lbl:'Users'},
+];
+document.getElementById('adminKpis').innerHTML = kpiData.map(k=>`
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="mini-kpi">
+      <div style="width:38px;height:38px;border-radius:var(--radius-sm);background:${k.bg};color:${k.ic};display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:0.75rem;"><i class="bi ${k.icon}"></i></div>
+      <div style="font-family:var(--font-display);font-size:1.7rem;font-weight:700;line-height:1;">${k.val}</div>
+      <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.2rem;">${k.lbl}</div>
+    </div>
+  </div>`).join('');
+
+// Booking row
+function bookingRow(b, showStatus=false) {
+  const statusMap = {approved:'<span class="badge-available">Approved</span>',pending:'<span class="badge-busy">Pending</span>',rejected:'<span class="badge-maintenance">Rejected</span>'};
+  const actions = b.status === 'pending'
+    ? `<button class="action-btn action-approve me-1" onclick="setStatus('${b.ref}','approved')">Approve</button><button class="action-btn action-reject" onclick="setStatus('${b.ref}','rejected')">Reject</button>`
+    : `<button class="action-btn action-view" onclick="showToast('Viewing: ${b.ref}','info')">View</button>`;
+  const statusCell = showStatus ? `<td>${statusMap[b.status]||''}</td>` : '';
+  return `<tr id="row-${b.ref}"><td style="font-size:0.75rem;color:var(--text-muted);">${b.ref}</td><td style="font-weight:500;color:var(--text-primary);">${b.event}</td><td>${b.venue}</td><td>${b.date}</td><td>${b.organizer}</td>${statusCell}<td>${actions}</td></tr>`;
+}
+
+document.getElementById('pendingTbody').innerHTML = pending.length ? pending.map(b=>bookingRow(b)).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;">No pending requests</td></tr>';
+document.getElementById('allBookingsTbody').innerHTML = allBookings.map(b=>bookingRow(b,true)).join('');
+
+function setStatus(ref, status) {
+  const row = document.getElementById('row-' + ref);
+  if (!row) return;
+  const statusMap = {approved:'<span class="badge-available">Approved</span>',rejected:'<span class="badge-maintenance">Rejected</span>'};
+  if (row.cells[5]) row.cells[5].innerHTML = statusMap[status] || '';
+  row.cells[row.cells.length-1].innerHTML = `<button class="action-btn action-view" onclick="showToast('Viewing: ${ref}','info')">View</button>`;
+  showToast(`Booking ${ref} ${status}`, status==='approved'?'success':'info');
+  // Update pending count
+  const newPending = document.querySelectorAll('#pendingTbody tr').length;
+  document.getElementById('pendingBadge').textContent = Math.max(0, parseInt(document.getElementById('pendingBadge').textContent||'0') - 1);
+}
+
+// Status bars
+const statCounts = ['approved','pending','rejected'].map(s=>({s,n:allBookings.filter(b=>b.status===s).length}));
+const maxStat = Math.max(...statCounts.map(x=>x.n), 1);
+const sColors = {approved:'#34d399',pending:'#fbbf24',rejected:'#f87171'};
+document.getElementById('statusBars').innerHTML = statCounts.map(x=>`
+  <div style="margin-bottom:0.85rem;">
+    <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.3rem;"><span style="text-transform:capitalize;">${x.s}</span><span style="font-weight:600;color:${sColors[x.s]};">${x.n}</span></div>
+    <div style="height:6px;background:var(--border-subtle);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${Math.round(x.n/maxStat*100)}%;background:${sColors[x.s]};border-radius:3px;transition:width 1s ease;"></div></div>
+  </div>`).join('');
+
+// Venue bars
+const vCounts = VENUES_DATA.map(v=>({n:v.name,val:Math.floor(Math.random()*8)+1}));
+const maxV = Math.max(...vCounts.map(x=>x.val),1);
+document.getElementById('venueBars').innerHTML = vCounts.map(x=>`
+  <div style="margin-bottom:0.85rem;">
+    <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.3rem;"><span>${x.n}</span><span style="color:var(--gold);font-weight:600;">${x.val}</span></div>
+    <div style="height:6px;background:var(--border-subtle);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${Math.round(x.val/maxV*100)}%;background:var(--gold);border-radius:3px;"></div></div>
+  </div>`).join('');
+
+// Events table
+document.getElementById('eventsTbody').innerHTML = EVENTS_DATA.map(e=>`
+  <tr><td style="font-weight:500;color:var(--text-primary);">${e.title}</td><td><span class="badge-category" style="font-size:0.7rem;">${e.cat}</span></td><td>${e.venue}</td><td>${e.date}</td><td><span style="color:var(--gold);font-weight:600;">${e.reg}</span></td>
+  <td><button class="action-btn action-view me-1" onclick="showToast('Editing ${e.title}','info')">Edit</button><button class="action-btn action-reject" onclick="showToast('Event hidden','info')">Hide</button></td></tr>`).join('');
+
+// Venues table
+document.getElementById('venuesTbody').innerHTML = VENUES_DATA.map(v=>`
+  <tr><td style="font-weight:500;color:var(--text-primary);">${v.name}</td><td>${v.type}</td><td>${v.cap}</td>
+  <td>${v.status==='available'?'<span class="badge-available">Available</span>':v.status==='busy'?'<span class="badge-busy">Busy</span>':'<span class="badge-maintenance">Maintenance</span>'}</td>
+  <td><button class="action-btn action-view" onclick="showToast('Editing ${v.name}','info')">Edit</button></td></tr>`).join('');
+
+// Users table
+function renderUsers(arr) {
+  const roleColors = {admin:'color:#f87171;border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.1)',student:'color:#a78bfa;border-color:rgba(139,92,246,0.3);background:rgba(139,92,246,0.1)',company:'color:var(--gold);border-color:var(--border);background:var(--gold-subtle)',club:'color:#34d399;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.1)'};
+  document.getElementById('usersTbody').innerHTML = arr.map(u=>`
+    <tr><td style="font-weight:500;color:var(--text-primary);">${u.name}</td><td style="color:var(--text-muted);">${u.email}</td>
+    <td><span style="font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:100px;border:1px solid;${roleColors[u.role]||''};text-transform:capitalize;">${u.role}</span></td>
+    <td style="color:var(--text-muted);">${u.joined}</td>
+    <td><button class="action-btn action-view" onclick="showToast('Viewing '+${JSON.stringify(u.name)},'info')">View</button></td></tr>`).join('');
+}
+renderUsers(USERS_DATA);
+document.getElementById('userSearch').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  renderUsers(USERS_DATA.filter(u=>(u.name+u.email+u.role).toLowerCase().includes(q)));
+});
+document.getElementById('userRoleFilter').addEventListener('change', e => {
+  const r = e.target.value;
+  renderUsers(r==='all'?USERS_DATA:USERS_DATA.filter(u=>u.role===r));
+});
+
+// Nav tabs
+document.querySelectorAll('.s-link[data-ap]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    document.querySelectorAll('.s-link[data-ap]').forEach(l=>l.classList.remove('active'));
+    a.classList.add('active');
+    const id = 'ap-' + a.dataset.ap;
+    document.querySelectorAll('.ap').forEach(p=>{p.style.display='none';p.classList.remove('show');});
+    const panel = document.getElementById(id);
+    if (panel) { panel.style.display='block'; panel.classList.add('show'); }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<script>document.documentElement.setAttribute("data-theme",localStorage.getItem("najah_theme")||"dark");</script>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reserve a Venue — Najah Events</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="global.css">
+  <style>
+    .reserve-layout { display:grid; grid-template-columns:1fr 380px; gap:2rem; }
+    @media(max-width:992px){ .reserve-layout{grid-template-columns:1fr;} }
+    .step-indicator { display:flex; align-items:center; gap:0; margin-bottom:2.5rem; }
+    .step { display:flex; align-items:center; gap:0.6rem; }
+    .step-num { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0; }
+    .step-num.active { background:var(--gold);color:#080c14; }
+    .step-num.done { background:rgba(52,211,153,0.2);color:#34d399;border:1px solid rgba(52,211,153,0.3); }
+    .step-num.pending { background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border-subtle); }
+    .step-label { font-size:0.8rem;font-weight:600;color:var(--text-secondary); }
+    .step-line { flex:1;height:1px;background:var(--border-subtle);margin:0 0.5rem; }
+    .section-panel { background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:2rem;margin-bottom:1.5rem; }
+    .panel-title { font-family:var(--font-display);font-size:1.15rem;font-weight:700;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border-subtle); }
+    .venue-select-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1rem; }
+    @media(max-width:576px){ .venue-select-grid{grid-template-columns:1fr;} }
+    .venue-option { border:2px solid var(--border-subtle);border-radius:var(--radius-md);padding:1rem;cursor:pointer;transition:var(--transition);background:var(--bg-surface); }
+    .venue-option:hover { border-color:var(--border); }
+    .venue-option.selected { border-color:var(--gold);background:var(--gold-subtle); }
+    .venue-option input[type=radio]{display:none;}
+    .vo-name { font-family:var(--font-display);font-weight:700;font-size:0.95rem;margin-bottom:0.2rem; }
+    .vo-meta { font-size:0.75rem;color:var(--text-muted); }
+    .summary-card { background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:1.5rem;position:sticky;top:calc(var(--nav-height)+1.5rem); }
+    .sum-row { display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--border-subtle);font-size:0.85rem; }
+    .sum-row:last-of-type{border-bottom:none;}
+    .sum-key{color:var(--text-muted);}
+    .sum-val{color:var(--text-primary);font-weight:600;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand gradient-text" href="index.html"><span style="font-size:1.1rem;">◆</span> Najah Events</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav mx-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="events.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="venues.html">Venues</a></li>
+        <li class="nav-item"><a class="nav-link" href="clubs.html">Clubs</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      </ul>
+      <ul class="navbar-nav align-items-lg-center gap-1" id="navUserSlot"></ul>
+    </div>
+  </div>
+</nav>
+
+<div class="page-hero" style="padding-bottom:3rem;">
+  <div class="container">
+    <div class="section-label mb-2"><i class="bi bi-calendar2-plus me-1"></i> Reservation</div>
+    <h1 class="section-title" style="font-size:clamp(2rem,4vw,2.8rem);">Book a Venue</h1>
+    <p style="color:var(--text-muted);margin-top:0.5rem;">Complete the form below to submit your venue reservation request.</p>
+  </div>
+</div>
+
+<section class="section-py-sm">
+  <div class="container">
+    <div class="step-indicator">
+      <div class="step"><div class="step-num active" id="s1">1</div><div class="step-label">Details</div></div>
+      <div class="step-line"></div>
+      <div class="step"><div class="step-num pending" id="s2">2</div><div class="step-label">Venue</div></div>
+      <div class="step-line"></div>
+      <div class="step"><div class="step-num pending" id="s3">3</div><div class="step-label">Confirm</div></div>
+    </div>
+
+    <div class="reserve-layout">
+      <div>
+        <!-- Event Info -->
+        <div class="section-panel">
+          <div class="panel-title"><i class="bi bi-info-circle me-2" style="color:var(--gold)"></i>Event Information</div>
+          <div class="row g-3">
+            <div class="col-12"><label class="form-label-dark">Event Name *</label><input type="text" class="form-control-dark" id="evtName" placeholder="e.g. Annual Career Expo 2026"></div>
+            <div class="col-md-6"><label class="form-label-dark">Event Type</label><select class="form-select-dark" id="evtType"><option>Expo / Exhibition</option><option>Conference</option><option>Workshop</option><option>Festival / Cultural</option><option>Sports Event</option><option>Graduation Ceremony</option><option>Other</option></select></div>
+            <div class="col-md-6"><label class="form-label-dark">Expected Attendees</label><input type="number" class="form-control-dark" id="evtAttendees" placeholder="e.g. 200" min="1"></div>
+            <div class="col-md-6"><label class="form-label-dark">Date *</label><input type="date" class="form-control-dark" id="evtDate"></div>
+            <div class="col-md-3"><label class="form-label-dark">Start Time</label><input type="time" class="form-control-dark" id="evtStart" value="09:00"></div>
+            <div class="col-md-3"><label class="form-label-dark">End Time</label><input type="time" class="form-control-dark" id="evtEnd" value="17:00"></div>
+            <div class="col-12"><label class="form-label-dark">Description / Requirements</label><textarea class="form-control-dark" rows="3" id="evtDesc" placeholder="Describe your event and any special requirements…"></textarea></div>
+          </div>
+        </div>
+
+        <!-- Organizer Info -->
+        <div class="section-panel">
+          <div class="panel-title"><i class="bi bi-person-badge me-2" style="color:var(--gold)"></i>Organizer Information</div>
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label-dark">Full Name *</label><input type="text" class="form-control-dark" id="orgName" placeholder="Your full name"></div>
+            <div class="col-md-6"><label class="form-label-dark">Email *</label><input type="email" class="form-control-dark" id="orgEmail" placeholder="email@najah.edu"></div>
+            <div class="col-md-6"><label class="form-label-dark">Phone</label><input type="tel" class="form-control-dark" id="orgPhone" placeholder="+970 5xx xxx xxxx"></div>
+            <div class="col-md-6"><label class="form-label-dark">Organization / Faculty</label><input type="text" class="form-control-dark" id="orgFaculty" placeholder="e.g. CS Department"></div>
+            <div class="col-md-6"><label class="form-label-dark">Role</label><select class="form-select-dark" id="orgRole"><option>Student</option><option>Club Leader</option><option>Faculty Member</option><option>Company Representative</option><option>Admin Staff</option></select></div>
+          </div>
+        </div>
+
+        <!-- Venue Selection -->
+        <div class="section-panel">
+          <div class="panel-title"><i class="bi bi-building me-2" style="color:var(--gold)"></i>Select Venue</div>
+          <div class="venue-select-grid" id="venueSelectGrid"></div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="section-panel">
+          <div class="panel-title"><i class="bi bi-chat-text me-2" style="color:var(--gold)"></i>Additional Requirements</div>
+          <div class="row g-3">
+            <div class="col-12">
+              <div style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:1rem;">
+                <label class="req-checkbox"><input type="checkbox" id="reqAV"> <span>AV Equipment</span></label>
+                <label class="req-checkbox"><input type="checkbox" id="reqTables"> <span>Tables & Chairs</span></label>
+                <label class="req-checkbox"><input type="checkbox" id="reqSecurity"> <span>Security</span></label>
+                <label class="req-checkbox"><input type="checkbox" id="reqCatering"> <span>Catering Setup</span></label>
+                <label class="req-checkbox"><input type="checkbox" id="reqPhotog"> <span>Photography</span></label>
+                <label class="req-checkbox"><input type="checkbox" id="reqLive"> <span>Live Streaming</span></label>
+              </div>
+            </div>
+            <div class="col-12"><label class="form-label-dark">Additional Notes</label><textarea class="form-control-dark" rows="2" id="addNotes" placeholder="Anything else the admin should know…"></textarea></div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 justify-content-end">
+          <a href="venues.html" class="btn-ghost">← Back to Venues</a>
+          <button class="btn-gold" id="submitBtn" style="font-size:1rem;padding:0.8rem 2.5rem;">
+            <i class="bi bi-send me-2"></i>Submit Request
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary Sidebar -->
+      <div>
+        <div class="summary-card">
+          <div class="footer-heading mb-3">Booking Summary</div>
+          <div id="summaryVenueImg" style="height:160px;border-radius:var(--radius-md);background:var(--bg-surface);margin-bottom:1.25rem;overflow:hidden;"></div>
+          <div class="sum-row"><span class="sum-key">Venue</span><span class="sum-val" id="sumVenue">—</span></div>
+          <div class="sum-row"><span class="sum-key">Date</span><span class="sum-val" id="sumDate">—</span></div>
+          <div class="sum-row"><span class="sum-key">Time</span><span class="sum-val" id="sumTime">—</span></div>
+          <div class="sum-row"><span class="sum-key">Event</span><span class="sum-val" id="sumEvent">—</span></div>
+          <div class="sum-row"><span class="sum-key">Attendees</span><span class="sum-val" id="sumAttendees">—</span></div>
+          <div class="sum-row"><span class="sum-key">Status</span><span class="badge-busy"><i class="bi bi-clock me-1"></i>Pending Review</span></div>
+          <hr style="border-color:var(--border-subtle);margin:1rem 0;">
+          <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.6;">Your request will be reviewed by the university events team. You'll receive a notification within 2 business days.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Success Modal -->
+<div class="modal fade modal-dark" id="successModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4">
+      <div style="width:72px;height:72px;border-radius:50%;background:rgba(52,211,153,0.15);border:2px solid rgba(52,211,153,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.8rem;color:#34d399;">
+        <i class="bi bi-check2"></i>
+      </div>
+      <h4 style="font-family:var(--font-display);">Request Submitted!</h4>
+      <p style="color:var(--text-muted);font-size:0.875rem;margin:0.75rem 0 1.5rem;">Your venue booking request has been received. Reference: <strong id="refNum" style="color:var(--gold);"></strong></p>
+      <div class="d-flex gap-2 justify-content-center">
+        <a href="dashboard.html" class="btn-gold"><i class="bi bi-grid me-1"></i> View Dashboard</a>
+        <a href="index.html" class="btn-ghost">← Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="global.js"></script>
+<script>
+const VENUES_DATA = [
+  {id:1,name:'Main Auditorium',cap:800,status:'available',img:'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=400&q=80'},
+  {id:2,name:'Engineering Hall',cap:350,status:'busy',img:'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400&q=80'},
+  {id:3,name:'Expo Hall',cap:600,status:'available',img:'https://images.unsplash.com/photo-1515169067868-5387ec356754?w=400&q=80'},
+  {id:4,name:'Outdoor Stage',cap:1200,status:'available',img:'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=400&q=80'},
+  {id:5,name:'Workshop Room A',cap:60,status:'maintenance',img:'https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=400&q=80'},
+  {id:6,name:'Computer Lab 2',cap:40,status:'available',img:'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=400&q=80'},
+];
+
+let selectedVenueId = null;
+
+// Render venue options
+const grid = document.getElementById('venueSelectGrid');
+const params = new URLSearchParams(location.search);
+const preselect = parseInt(params.get('venue'), 10);
+
+VENUES_DATA.forEach(v => {
+  const avail = v.status === 'available';
+  const div = document.createElement('label');
+  div.className = 'venue-option' + (!avail ? ' opacity-50' : '');
+  div.innerHTML = `
+    <input type="radio" name="venueChoice" value="${v.id}" ${!avail ? 'disabled' : ''}>
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <div class="vo-name">${v.name}</div>
+      ${!avail ? `<span class="badge-busy" style="font-size:0.65rem;">${v.status}</span>` : ''}
+    </div>
+    <div class="vo-meta"><i class="bi bi-people me-1"></i>Up to ${v.cap} · ${avail ? '✓ Available' : '✗ Unavailable'}</div>`;
+  div.addEventListener('click', () => {
+    if (!avail) return;
+    document.querySelectorAll('.venue-option').forEach(o => o.classList.remove('selected'));
+    div.classList.add('selected');
+    selectedVenueId = v.id;
+    updateSummary();
+    document.getElementById('summaryVenueImg').style.backgroundImage = `url(${v.img})`;
+    document.getElementById('summaryVenueImg').style.backgroundSize = 'cover';
+    document.getElementById('summaryVenueImg').style.backgroundPosition = 'center';
+    document.getElementById('sumVenue').textContent = v.name;
+  });
+  grid.appendChild(div);
+  if (v.id === preselect && avail) div.click();
+});
+
+// Live summary update
+function updateSummary() {
+  const d = document.getElementById('evtDate').value;
+  const s = document.getElementById('evtStart').value;
+  const e = document.getElementById('evtEnd').value;
+  const n = document.getElementById('evtName').value;
+  const a = document.getElementById('evtAttendees').value;
+  if (d) document.getElementById('sumDate').textContent = new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  if (s && e) document.getElementById('sumTime').textContent = s + ' – ' + e;
+  document.getElementById('sumEvent').textContent = n || '—';
+  document.getElementById('sumAttendees').textContent = a ? a + ' people' : '—';
+}
+
+['evtDate','evtStart','evtEnd','evtName','evtAttendees'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateSummary);
+});
+
+// Submit
+document.getElementById('submitBtn').addEventListener('click', () => {
+  const name = document.getElementById('evtName').value.trim();
+  const date = document.getElementById('evtDate').value;
+  const orgName = document.getElementById('orgName').value.trim();
+  const orgEmail = document.getElementById('orgEmail').value.trim();
+  if (!name || !date || !orgName || !orgEmail) { showToast('Please fill all required fields (*)', 'error'); return; }
+  if (!selectedVenueId) { showToast('Please select a venue', 'error'); return; }
+  const ref = 'NE-' + Date.now().toString(36).toUpperCase();
+  const booking = { ref, venueId:selectedVenueId, eventName:name, date, organizer:orgName, email:orgEmail, status:'pending', submitted:new Date().toISOString() };
+  const bks = JSON.parse(localStorage.getItem('najah_bookings')||'[]');
+  bks.push(booking);
+  localStorage.setItem('najah_bookings', JSON.stringify(bks));
+  document.getElementById('refNum').textContent = ref;
+  new bootstrap.Modal(document.getElementById('successModal')).show();
+});
+
+// Checkbox styles
+document.querySelectorAll('.req-checkbox').forEach(l => {
+  l.style.cssText = 'display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--text-secondary);cursor:pointer;padding:0.35rem 0.85rem;border:1px solid var(--border-subtle);border-radius:100px;background:var(--bg-input);transition:var(--transition)';
+  const cb = l.querySelector('input');
+  cb.addEventListener('change', () => {
+    l.style.borderColor = cb.checked ? 'var(--gold)' : 'var(--border-subtle)';
+    l.style.background = cb.checked ? 'var(--gold-subtle)' : 'var(--bg-input)';
+    l.style.color = cb.checked ? 'var(--gold)' : 'var(--text-secondary)';
+  });
+});
+</script>
+</body>
+</html>

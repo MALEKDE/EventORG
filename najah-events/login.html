@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<script>document.documentElement.setAttribute("data-theme",localStorage.getItem("najah_theme")||"dark");</script>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — Najah Events</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="global.css">
+  <style>
+    body{min-height:100vh;display:flex;align-items:center;background:var(--bg-base);}
+    .auth-grid{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;width:100%;}
+    @media(max-width:992px){.auth-grid{grid-template-columns:1fr;} .auth-visual{display:none!important;}}
+    .auth-visual{background:linear-gradient(135deg,rgba(201,168,76,0.1) 0%,rgba(8,12,20,0) 100%),url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=900&q=80') center/cover;position:relative;}
+    .auth-visual::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 0%,rgba(8,12,20,0.7) 100%);}
+    .auth-visual-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:3rem;z-index:1;}
+    .auth-panel{display:flex;flex-direction:column;justify-content:center;padding:3rem 4rem;background:var(--bg-base);}
+    @media(max-width:576px){.auth-panel{padding:2rem 1.5rem;}}
+    .auth-brand{font-family:var(--font-display);font-size:1.4rem;font-weight:700;margin-bottom:3rem;}
+    .auth-title{font-family:var(--font-display);font-size:2.2rem;font-weight:700;margin-bottom:0.5rem;}
+    .input-icon-wrap{position:relative;}
+    .input-icon{position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.9rem;}
+    .input-icon-wrap .form-control-dark{padding-left:2.6rem;}
+    .eye-toggle{position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0;font-size:0.9rem;}
+    .divider{display:flex;align-items:center;gap:1rem;margin:1.5rem 0;color:var(--text-muted);font-size:0.8rem;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border-subtle);}
+    .social-btn{width:100%;padding:0.7rem;border:1px solid var(--border-subtle);background:var(--bg-input);color:var(--text-secondary);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.875rem;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:0.6rem;}
+    .social-btn:hover{border-color:var(--border);color:var(--text-primary);}
+  </style>
+</head>
+<body>
+<div class="auth-grid">
+  <div class="auth-visual">
+    <div class="auth-visual-content">
+      <div class="display-heading" style="font-size:2.5rem;max-width:400px;">
+        Welcome Back to <em class="gradient-text">Najah Events</em>
+      </div>
+      <p style="color:rgba(240,236,226,0.65);margin-top:1rem;max-width:350px;font-size:0.95rem;line-height:1.7;">Your gateway to university events, venue bookings, and campus experiences.</p>
+      <div class="d-flex gap-3 mt-4">
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-md);padding:1rem 1.5rem;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:700;color:var(--gold);">147+</div>
+          <div style="font-size:0.72rem;color:rgba(240,236,226,0.5);text-transform:uppercase;letter-spacing:0.1em;margin-top:0.2rem;">Events</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-md);padding:1rem 1.5rem;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:700;color:var(--gold);">5k+</div>
+          <div style="font-size:0.72rem;color:rgba(240,236,226,0.5);text-transform:uppercase;letter-spacing:0.1em;margin-top:0.2rem;">Students</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-md);padding:1rem 1.5rem;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:700;color:var(--gold);">38</div>
+          <div style="font-size:0.72rem;color:rgba(240,236,226,0.5);text-transform:uppercase;letter-spacing:0.1em;margin-top:0.2rem;">Venues</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-panel">
+    <div class="auth-brand gradient-text">◆ Najah Events</div>
+    <h2 class="auth-title">Sign In</h2>
+    <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem;">New here? <a href="register.html" style="color:var(--gold);text-decoration:none;font-weight:600;">Create an account</a></p>
+
+    <div id="loginError" class="mb-3" style="display:none;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:var(--radius-sm);padding:0.75rem 1rem;font-size:0.85rem;color:#f87171;"></div>
+
+    <div class="mb-3"><label class="form-label-dark">Email Address</label>
+      <div class="input-icon-wrap"><i class="bi bi-envelope input-icon"></i><input type="email" class="form-control-dark" id="loginEmail" placeholder="you@najah.edu" autofocus></div>
+    </div>
+    <div class="mb-4"><label class="form-label-dark">Password</label>
+      <div class="input-icon-wrap"><i class="bi bi-lock input-icon"></i><input type="password" class="form-control-dark" id="loginPass" placeholder="••••••••">
+        <button type="button" class="eye-toggle" id="eyeBtn"><i class="bi bi-eye" id="eyeIcon"></i></button>
+      </div>
+      <div class="d-flex justify-content-end mt-2"><a href="#" style="font-size:0.78rem;color:var(--text-muted);text-decoration:none;">Forgot password?</a></div>
+    </div>
+
+    <button class="btn-gold w-100" id="loginBtn" style="font-size:0.95rem;padding:0.8rem;justify-content:center;">
+      <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+    </button>
+
+    <div class="divider">or continue with</div>
+
+    <div class="d-flex gap-2">
+      <button class="social-btn flex-grow-1" onclick="demoLogin('student')"><i class="bi bi-mortarboard"></i> Demo Student</button>
+      <button class="social-btn flex-grow-1" onclick="demoLogin('admin')"><i class="bi bi-shield-check"></i> Demo Admin</button>
+    </div>
+
+    <p style="font-size:0.75rem;color:var(--text-muted);margin-top:2rem;line-height:1.6;">By signing in, you agree to our <a href="#" style="color:var(--text-secondary);text-decoration:none;">Terms</a> and <a href="#" style="color:var(--text-secondary);text-decoration:none;">Privacy Policy</a>.</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="global.js"></script>
+<script>
+const DEMO_USERS = [
+  {email:'student@najah.edu',password:'demo123',name:'Ahmad Khalil',role:'student',id:'202011234'},
+  {email:'admin@najah.edu',password:'admin123',name:'Events Admin',role:'admin',id:'STAFF001'},
+  {email:'club@najah.edu',password:'demo123',name:'Sana Haddad',role:'club',id:'CLUB002'},
+];
+
+document.getElementById('eyeBtn').addEventListener('click', () => {
+  const inp = document.getElementById('loginPass');
+  const icon = document.getElementById('eyeIcon');
+  if (inp.type === 'password') { inp.type='text'; icon.className='bi bi-eye-slash'; }
+  else { inp.type='password'; icon.className='bi bi-eye'; }
+});
+
+function tryLogin(email, password) {
+  const user = DEMO_USERS.find(u => u.email === email.toLowerCase() && u.password === password);
+  if (user) {
+    setCurrentUser(user);
+    showToast('Welcome back, ' + user.name + '!', 'success');
+    setTimeout(() => window.location.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html', 1000);
+  } else {
+    const err = document.getElementById('loginError');
+    err.textContent = 'Invalid email or password. Try demo accounts below.';
+    err.style.display = 'block';
+  }
+}
+
+document.getElementById('loginBtn').addEventListener('click', () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if (!email || !pass) { showToast('Please fill all fields', 'error'); return; }
+  tryLogin(email, pass);
+});
+
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); });
+
+function demoLogin(role) {
+  const user = DEMO_USERS.find(u => u.role === role) || DEMO_USERS[0];
+  document.getElementById('loginEmail').value = user.email;
+  document.getElementById('loginPass').value = user.password;
+  setTimeout(() => tryLogin(user.email, user.password), 400);
+}
+
+if (getCurrentUser()) window.location.href = 'dashboard.html';
+</script>
+</body>
+</html>

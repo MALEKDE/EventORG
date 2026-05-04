@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<script>document.documentElement.setAttribute("data-theme",localStorage.getItem("najah_theme")||"dark");</script>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — Najah Events</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="global.css">
+  <style>
+    body{min-height:100vh;display:flex;align-items:stretch;background:var(--bg-base);}
+    .auth-grid{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;width:100%;}
+    @media(max-width:992px){.auth-grid{grid-template-columns:1fr;} .auth-visual{display:none!important;}}
+    .auth-visual{background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(8,12,20,0)),url('https://images.unsplash.com/photo-1515169067868-5387ec356754?w=900&q=80') center/cover;position:relative;}
+    .auth-visual::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent,rgba(8,12,20,0.75));}
+    .auth-visual-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:3rem;z-index:1;}
+    .auth-panel{display:flex;flex-direction:column;justify-content:center;padding:2.5rem 4rem;background:var(--bg-base);overflow-y:auto;}
+    @media(max-width:576px){.auth-panel{padding:2rem 1.5rem;}}
+    .auth-brand{font-family:var(--font-display);font-size:1.4rem;font-weight:700;margin-bottom:2.5rem;}
+    .role-card{border:2px solid var(--border-subtle);border-radius:var(--radius-md);padding:1.1rem;cursor:pointer;transition:var(--transition);background:var(--bg-surface);display:flex;align-items:flex-start;gap:0.85rem;}
+    .role-card:hover{border-color:var(--border);}
+    .role-card.selected{border-color:var(--gold);background:var(--gold-subtle);}
+    .role-card input{display:none;}
+    .role-icon{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+    .input-icon-wrap{position:relative;}
+    .input-icon{position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.9rem;}
+    .input-icon-wrap .form-control-dark{padding-left:2.6rem;}
+    .pw-strength{height:3px;border-radius:2px;margin-top:0.4rem;transition:all 0.4s;}
+    .progress-dots{display:flex;gap:0.3rem;margin-top:0.5rem;}
+    .dot-step{flex:1;height:3px;border-radius:2px;background:var(--border-subtle);transition:background 0.3s;}
+    .dot-step.active{background:var(--gold);}
+    .step-form{display:none;} .step-form.show{display:block;}
+    .step-nav{display:flex;gap:1rem;align-items:center;margin-bottom:2rem;}
+    .sn-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0;}
+    .sn-num.cur{background:var(--gold);color:#080c14;}
+    .sn-num.done{background:rgba(52,211,153,0.2);border:1px solid rgba(52,211,153,0.3);color:#34d399;}
+    .sn-num.pend{background:var(--bg-card);border:1px solid var(--border-subtle);color:var(--text-muted);}
+    .sn-line{flex:1;height:1px;background:var(--border-subtle);}
+  </style>
+</head>
+<body>
+<div class="auth-grid">
+  <div class="auth-visual">
+    <div class="auth-visual-content">
+      <div class="display-heading" style="font-size:2.5rem;max-width:400px;">Join <em class="gradient-text">Najah Events</em> Today</div>
+      <p style="color:rgba(240,236,226,0.65);margin-top:1rem;max-width:340px;font-size:0.95rem;line-height:1.7;">Create your account and start discovering, booking, and organizing university events.</p>
+      <div class="d-flex flex-column gap-2 mt-4">
+        <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.875rem;color:rgba(240,236,226,0.75);"><i class="bi bi-check-circle-fill" style="color:var(--gold);flex-shrink:0;"></i>Free account — no credit card needed</div>
+        <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.875rem;color:rgba(240,236,226,0.75);"><i class="bi bi-check-circle-fill" style="color:var(--gold);flex-shrink:0;"></i>Access all campus events instantly</div>
+        <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.875rem;color:rgba(240,236,226,0.75);"><i class="bi bi-check-circle-fill" style="color:var(--gold);flex-shrink:0;"></i>Book venues with real-time availability</div>
+        <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.875rem;color:rgba(240,236,226,0.75);"><i class="bi bi-check-circle-fill" style="color:var(--gold);flex-shrink:0;"></i>Track all your bookings in one dashboard</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-panel">
+    <div class="auth-brand gradient-text">◆ Najah Events</div>
+    <div class="step-nav">
+      <div class="sn-num cur" id="sn1">1</div><div style="font-size:0.78rem;color:var(--text-secondary);">Account Type</div>
+      <div class="sn-line"></div>
+      <div class="sn-num pend" id="sn2">2</div><div style="font-size:0.78rem;color:var(--text-muted);">Personal Info</div>
+      <div class="sn-line"></div>
+      <div class="sn-num pend" id="sn3">3</div><div style="font-size:0.78rem;color:var(--text-muted);">Security</div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step-form show" id="step1">
+      <h4 style="font-family:var(--font-display);font-size:1.6rem;margin-bottom:0.4rem;">Choose Account Type</h4>
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1.5rem;">Select how you'll be using the platform</p>
+      <div class="d-flex flex-column gap-2 mb-4">
+        <label class="role-card" id="rcStudent"><input type="radio" name="role" value="student" checked>
+          <div class="role-icon" style="background:rgba(139,92,246,0.15);color:#a78bfa;"><i class="bi bi-mortarboard-fill"></i></div>
+          <div><div style="font-weight:700;font-size:0.9rem;">Student</div><div style="font-size:0.78rem;color:var(--text-muted);">Register for events, join clubs, explore campus.</div></div>
+        </label>
+        <label class="role-card" id="rcCompany"><input type="radio" name="role" value="company">
+          <div class="role-icon" style="background:var(--gold-subtle);color:var(--gold);"><i class="bi bi-building-fill"></i></div>
+          <div><div style="font-weight:700;font-size:0.9rem;">Company</div><div style="font-size:0.78rem;color:var(--text-muted);">Reserve booths, participate in career expos.</div></div>
+        </label>
+        <label class="role-card" id="rcClub"><input type="radio" name="role" value="club">
+          <div class="role-icon" style="background:rgba(52,211,153,0.12);color:#34d399;"><i class="bi bi-people-fill"></i></div>
+          <div><div style="font-weight:700;font-size:0.9rem;">Club Leader</div><div style="font-size:0.78rem;color:var(--text-muted);">Organize and manage university club events.</div></div>
+        </label>
+      </div>
+      <button class="btn-gold w-100" style="justify-content:center;padding:0.8rem;" onclick="goStep(2)">Continue <i class="bi bi-arrow-right ms-1"></i></button>
+      <p style="text-align:center;margin-top:1.5rem;font-size:0.83rem;color:var(--text-muted);">Already have an account? <a href="login.html" style="color:var(--gold);text-decoration:none;font-weight:600;">Sign in</a></p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-form" id="step2">
+      <h4 style="font-family:var(--font-display);font-size:1.6rem;margin-bottom:0.4rem;">Personal Information</h4>
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1.5rem;">Tell us about yourself</p>
+      <div class="row g-3">
+        <div class="col-6"><label class="form-label-dark">First Name *</label><input type="text" class="form-control-dark" id="fname" placeholder="Ahmad"></div>
+        <div class="col-6"><label class="form-label-dark">Last Name *</label><input type="text" class="form-control-dark" id="lname" placeholder="Khalil"></div>
+        <div class="col-12"><label class="form-label-dark">Email *</label><div class="input-icon-wrap"><i class="bi bi-envelope input-icon"></i><input type="email" class="form-control-dark" id="remail" placeholder="you@najah.edu"></div></div>
+        <div class="col-12"><label class="form-label-dark">Phone</label><div class="input-icon-wrap"><i class="bi bi-phone input-icon"></i><input type="tel" class="form-control-dark" id="rphone" placeholder="+970 5xx xxx xxxx"></div></div>
+        <div class="col-12" id="studentIdRow"><label class="form-label-dark">Student ID</label><div class="input-icon-wrap"><i class="bi bi-card-text input-icon"></i><input type="text" class="form-control-dark" id="rstudentId" placeholder="e.g. 202011234"></div></div>
+        <div class="col-12" id="orgRow" style="display:none;"><label class="form-label-dark">Organization Name *</label><input type="text" class="form-control-dark" id="rorg" placeholder="Company / Club name"></div>
+      </div>
+      <div class="d-flex gap-2 mt-4">
+        <button class="btn-ghost" onclick="goStep(1)"><i class="bi bi-arrow-left me-1"></i> Back</button>
+        <button class="btn-gold flex-grow-1" style="justify-content:center;padding:0.8rem;" onclick="goStep(3)">Continue <i class="bi bi-arrow-right ms-1"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-form" id="step3">
+      <h4 style="font-family:var(--font-display);font-size:1.6rem;margin-bottom:0.4rem;">Create Password</h4>
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1.5rem;">Choose a strong password for your account</p>
+      <div class="mb-3"><label class="form-label-dark">Password *</label>
+        <div class="input-icon-wrap"><i class="bi bi-lock input-icon"></i><input type="password" class="form-control-dark" id="rpass" placeholder="Min. 8 characters" oninput="checkStrength()">
+          <button type="button" class="eye-toggle" style="position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;" onclick="toggleEye('rpass',this)"><i class="bi bi-eye"></i></button>
+        </div>
+        <div class="progress-dots mt-2" id="strengthDots">
+          <div class="dot-step" id="d1"></div><div class="dot-step" id="d2"></div><div class="dot-step" id="d3"></div><div class="dot-step" id="d4"></div>
+        </div>
+        <div style="font-size:0.72rem;margin-top:0.4rem;" id="strengthLabel"></div>
+      </div>
+      <div class="mb-4"><label class="form-label-dark">Confirm Password *</label>
+        <div class="input-icon-wrap"><i class="bi bi-lock-fill input-icon"></i><input type="password" class="form-control-dark" id="rpass2" placeholder="Repeat password"></div>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:0.6rem;font-size:0.8rem;color:var(--text-muted);cursor:pointer;margin-bottom:1.5rem;">
+        <input type="checkbox" id="agreeTerms" style="margin-top:2px;accent-color:var(--gold);">
+        I agree to the <a href="#" style="color:var(--gold);text-decoration:none;">Terms of Service</a> and <a href="#" style="color:var(--gold);text-decoration:none;">Privacy Policy</a>
+      </label>
+      <div class="d-flex gap-2">
+        <button class="btn-ghost" onclick="goStep(2)"><i class="bi bi-arrow-left me-1"></i> Back</button>
+        <button class="btn-gold flex-grow-1" style="justify-content:center;padding:0.8rem;" id="createBtn"><i class="bi bi-person-check me-1"></i> Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="global.js"></script>
+<script>
+let currentStep = 1;
+
+function goStep(n) {
+  if (n === 2) {
+    const r = document.querySelector('input[name="role"]:checked');
+    const isCompanyOrClub = r && (r.value === 'company' || r.value === 'club');
+    document.getElementById('studentIdRow').style.display = isCompanyOrClub ? 'none' : 'block';
+    document.getElementById('orgRow').style.display = isCompanyOrClub ? 'block' : 'none';
+  }
+  if (n === 3) {
+    if (!document.getElementById('remail').value.trim() || !document.getElementById('fname').value.trim()) {
+      showToast('Please fill required fields', 'error'); return;
+    }
+  }
+  document.getElementById('step' + currentStep).classList.remove('show');
+  document.getElementById('step' + n).classList.add('show');
+  ['sn1','sn2','sn3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (i + 1 < n) { el.className = 'sn-num done'; el.innerHTML = '<i class="bi bi-check2"></i>'; }
+    else if (i + 1 === n) { el.className = 'sn-num cur'; el.textContent = i + 1; }
+    else { el.className = 'sn-num pend'; el.textContent = i + 1; }
+  });
+  currentStep = n;
+}
+
+// Role card selection
+document.querySelectorAll('.role-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    card.querySelector('input').checked = true;
+  });
+  if (card.querySelector('input').checked) card.classList.add('selected');
+});
+
+function checkStrength() {
+  const val = document.getElementById('rpass').value;
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const colors = ['#f87171','#fbbf24','var(--gold)','#34d399'];
+  const labels = ['Weak','Fair','Good','Strong'];
+  for (let i = 1; i <= 4; i++) {
+    const d = document.getElementById('d' + i);
+    d.style.background = i <= score ? colors[score - 1] : 'var(--border-subtle)';
+  }
+  const lbl = document.getElementById('strengthLabel');
+  lbl.textContent = val.length ? labels[score - 1] || '' : '';
+  lbl.style.color = colors[score - 1] || 'var(--text-muted)';
+}
+
+function toggleEye(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  const icon = btn.querySelector('i');
+  if (inp.type === 'password') { inp.type = 'text'; icon.className = 'bi bi-eye-slash'; }
+  else { inp.type = 'password'; icon.className = 'bi bi-eye'; }
+}
+
+document.getElementById('createBtn').addEventListener('click', () => {
+  const pass = document.getElementById('rpass').value;
+  const pass2 = document.getElementById('rpass2').value;
+  const agree = document.getElementById('agreeTerms').checked;
+  if (!pass || pass.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+  if (pass !== pass2) { showToast('Passwords do not match', 'error'); return; }
+  if (!agree) { showToast('Please agree to the terms', 'error'); return; }
+  const role = document.querySelector('input[name="role"]:checked')?.value || 'student';
+  const user = {
+    name: (document.getElementById('fname').value + ' ' + document.getElementById('lname').value).trim(),
+    email: document.getElementById('remail').value.trim(),
+    role, id: 'USR' + Date.now()
+  };
+  setCurrentUser(user);
+  showToast('Account created! Welcome, ' + user.name + ' 🎉', 'success');
+  setTimeout(() => window.location.href = 'dashboard.html', 1200);
+});
+</script>
+</body>
+</html>

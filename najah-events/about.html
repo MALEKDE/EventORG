@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<script>document.documentElement.setAttribute("data-theme",localStorage.getItem("najah_theme")||"dark");</script>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About — Najah Events</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="global.css">
+  <style>
+    .timeline{position:relative;padding-left:2.5rem;}
+    .timeline::before{content:'';position:absolute;left:0.75rem;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--gold),transparent);}
+    .tl-item{position:relative;margin-bottom:2rem;}
+    .tl-item::before{content:'';position:absolute;left:-2rem;top:0.3rem;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--bg-base);}
+    .tl-year{font-size:0.72rem;font-weight:700;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.25rem;}
+    .tl-text{font-size:0.875rem;color:var(--text-secondary);line-height:1.65;}
+    .team-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:1.75rem;text-align:center;transition:var(--transition);}
+    .team-card:hover{transform:translateY(-3px);border-color:var(--border);}
+    .team-avatar{width:80px;height:80px;border-radius:50%;margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;font-size:2rem;font-family:var(--font-display);font-weight:700;}
+    .value-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:1.75rem;height:100%;transition:var(--transition);}
+    .value-card:hover{border-color:var(--border);transform:translateY(-3px);}
+    .value-icon{width:52px;height:52px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1.25rem;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand gradient-text" href="index.html"><span style="font-size:1.1rem;">◆</span> Najah Events</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav mx-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="events.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="venues.html">Venues</a></li>
+        <li class="nav-item"><a class="nav-link" href="clubs.html">Clubs</a></li>
+        <li class="nav-item"><a class="nav-link active" href="about.html">About</a></li>
+      </ul>
+      <ul class="navbar-nav align-items-lg-center gap-1" id="navUserSlot"></ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="page-hero" style="padding-bottom:4rem;">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <div class="section-label mb-2"><i class="bi bi-info-circle me-1"></i> About</div>
+        <h1 class="section-title" style="font-size:clamp(2rem,4vw,3.5rem);">The Platform Behind<br><em class="gradient-text">Campus Events</em></h1>
+        <p style="color:var(--text-secondary);margin-top:1rem;font-size:1rem;line-height:1.75;max-width:520px;">Najah Events was built to eliminate the chaos of manual event coordination at An-Najah National University — bringing together students, companies, and clubs in one elegant digital system.</p>
+        <div class="d-flex gap-3 mt-4 flex-wrap">
+          <a href="register.html" class="btn-gold"><i class="bi bi-person-plus me-1"></i>Get Started Free</a>
+          <a href="events.html" class="btn-outline-gold"><i class="bi bi-compass me-1"></i>Explore Events</a>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="row g-3">
+          <div class="col-6"><div class="glass-panel p-3 text-center"><div style="font-family:var(--font-display);font-size:2.5rem;font-weight:700;color:var(--gold);">2024</div><div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:0.25rem;">Founded</div></div></div>
+          <div class="col-6"><div class="glass-panel p-3 text-center"><div style="font-family:var(--font-display);font-size:2.5rem;font-weight:700;color:#34d399;">147+</div><div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:0.25rem;">Events</div></div></div>
+          <div class="col-6"><div class="glass-panel p-3 text-center"><div style="font-family:var(--font-display);font-size:2.5rem;font-weight:700;color:#a78bfa;">5k+</div><div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:0.25rem;">Students</div></div></div>
+          <div class="col-6"><div class="glass-panel p-3 text-center"><div style="font-family:var(--font-display);font-size:2.5rem;font-weight:700;color:#f472b6;">24</div><div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:0.25rem;">Clubs</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mission -->
+<section class="section-py">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-5" data-reveal="0">
+        <div class="section-label mb-2">Our Mission</div>
+        <h2 class="section-title">Simplifying University Event Management</h2>
+        <p style="color:var(--text-secondary);margin-top:1rem;line-height:1.75;">We believe every campus event deserves seamless organization — from the first idea to the final applause. Najah Events replaces paperwork, phone calls, and waiting rooms with an elegant digital workflow.</p>
+        <p style="color:var(--text-secondary);margin-top:0.75rem;line-height:1.75;">Our platform is built specifically for the unique needs of An-Najah National University — respecting the culture, scale, and ambitions of Palestine's largest university.</p>
+      </div>
+      <div class="col-lg-7" data-reveal="200">
+        <div class="row g-3">
+          <div class="col-6"><div class="value-card"><div class="value-icon" style="background:var(--gold-subtle);color:var(--gold);"><i class="bi bi-lightning-charge-fill"></i></div><h6 style="font-family:var(--font-display);">Fast & Efficient</h6><p style="font-size:0.82rem;color:var(--text-muted);">Reduce booking time from days to minutes with our streamlined workflow.</p></div></div>
+          <div class="col-6"><div class="value-card"><div class="value-icon" style="background:rgba(52,211,153,0.1);color:#34d399;"><i class="bi bi-shield-check-fill"></i></div><h6 style="font-family:var(--font-display);">Transparent</h6><p style="font-size:0.82rem;color:var(--text-muted);">Real-time status tracking keeps everyone informed at every step.</p></div></div>
+          <div class="col-6"><div class="value-card"><div class="value-icon" style="background:rgba(139,92,246,0.1);color:#a78bfa;"><i class="bi bi-people-fill"></i></div><h6 style="font-family:var(--font-display);">Inclusive</h6><p style="font-size:0.82rem;color:var(--text-muted);">Built for students, companies, and clubs — one platform for all.</p></div></div>
+          <div class="col-6"><div class="value-card"><div class="value-icon" style="background:rgba(244,114,182,0.1);color:#f472b6;"><i class="bi bi-stars"></i></div><h6 style="font-family:var(--font-display);">Premium UX</h6><p style="font-size:0.82rem;color:var(--text-muted);">A polished, modern experience worthy of a world-class university.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="gold-divider">
+
+<!-- How We're Different -->
+<section class="section-py">
+  <div class="container">
+    <div class="section-header text-center mx-auto" style="max-width:580px;" data-reveal="0">
+      <div class="section-label">Features</div>
+      <h2 class="section-title mt-2">What Makes Us Different</h2>
+    </div>
+    <div class="row g-4 mt-4">
+      <div class="col-md-6 col-lg-4" data-reveal="0"><div class="value-card"><div class="value-icon" style="background:var(--gold-subtle);color:var(--gold);"><i class="bi bi-calendar2-check"></i></div><h5 style="font-family:var(--font-display);">Real-Time Availability</h5><p style="font-size:0.875rem;color:var(--text-muted);">See exactly which venues are available, busy, or under maintenance — no guesswork, no phone calls.</p></div></div>
+      <div class="col-md-6 col-lg-4" data-reveal="100"><div class="value-card"><div class="value-icon" style="background:rgba(52,211,153,0.1);color:#34d399;"><i class="bi bi-bell-fill"></i></div><h5 style="font-family:var(--font-display);">Instant Notifications</h5><p style="font-size:0.875rem;color:var(--text-muted);">Get notified the moment your booking is approved, rejected, or updated — no more waiting.</p></div></div>
+      <div class="col-md-6 col-lg-4" data-reveal="200"><div class="value-card"><div class="value-icon" style="background:rgba(139,92,246,0.1);color:#a78bfa;"><i class="bi bi-layout-text-window"></i></div><h5 style="font-family:var(--font-display);">Visual Venue Layouts</h5><p style="font-size:0.875rem;color:var(--text-muted);">Browse detailed venue pages with capacity info, facilities, and visual previews before booking.</p></div></div>
+      <div class="col-md-6 col-lg-4" data-reveal="0"><div class="value-card"><div class="value-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;"><i class="bi bi-graph-up"></i></div><h5 style="font-family:var(--font-display);">Admin Analytics</h5><p style="font-size:0.875rem;color:var(--text-muted);">Powerful admin dashboard with booking trends, approval rates, and venue utilization metrics.</p></div></div>
+      <div class="col-md-6 col-lg-4" data-reveal="100"><div class="value-card"><div class="value-icon" style="background:rgba(244,114,182,0.1);color:#f472b6;"><i class="bi bi-people-fill"></i></div><h5 style="font-family:var(--font-display);">Club Management</h5><p style="font-size:0.875rem;color:var(--text-muted);">Dedicated tools for student clubs to organize events, manage members, and grow their community.</p></div></div>
+      <div class="col-md-6 col-lg-4" data-reveal="200"><div class="value-card"><div class="value-icon" style="background:rgba(52,211,153,0.1);color:#34d399;"><i class="bi bi-phone"></i></div><h5 style="font-family:var(--font-display);">Mobile Friendly</h5><p style="font-size:0.875rem;color:var(--text-muted);">Fully responsive design — manage everything from your phone, tablet, or desktop seamlessly.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="gold-divider">
+
+<!-- Timeline -->
+<section class="section-py">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-5" data-reveal="0">
+        <div class="section-label mb-2">Our Story</div>
+        <h2 class="section-title">From Idea to Platform</h2>
+        <p style="color:var(--text-secondary);margin-top:1rem;line-height:1.75;">What started as a frustration with manual booking forms evolved into the university's primary event management solution.</p>
+      </div>
+      <div class="col-lg-7" data-reveal="200">
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-year">Early 2024</div><div style="font-weight:600;color:var(--text-primary);margin-bottom:0.3rem;">The Problem Identified</div><div class="tl-text">Students and clubs spent weeks navigating manual booking forms and email chains just to reserve a room for a 2-hour meeting.</div></div>
+          <div class="tl-item"><div class="tl-year">Mid 2024</div><div style="font-weight:600;color:var(--text-primary);margin-bottom:0.3rem;">Platform Conceptualized</div><div class="tl-text">A team of CS students proposed a centralized digital solution — one dashboard for events, bookings, and approvals.</div></div>
+          <div class="tl-item"><div class="tl-year">Late 2024</div><div style="font-weight:600;color:var(--text-primary);margin-bottom:0.3rem;">Beta Launch</div><div class="tl-text">First version launched with basic venue booking and event browsing. 200+ students signed up in the first week.</div></div>
+          <div class="tl-item"><div class="tl-year">2025</div><div style="font-weight:600;color:var(--text-primary);margin-bottom:0.3rem;">Full Feature Release</div><div class="tl-text">Company portal, clubs module, admin dashboard, and real-time notifications added. 5,000+ active users.</div></div>
+          <div class="tl-item"><div class="tl-year">2026 →</div><div style="font-weight:600;color:var(--text-primary);margin-bottom:0.3rem;">The Future</div><div class="tl-text">Mobile apps, AI-powered event recommendations, and integration with the university's student portal on the roadmap.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="gold-divider">
+
+<!-- Team -->
+<section class="section-py">
+  <div class="container">
+    <div class="section-header text-center mx-auto" style="max-width:500px;" data-reveal="0">
+      <div class="section-label">Team</div>
+      <h2 class="section-title mt-2">Meet the Builders</h2>
+    </div>
+    <div class="row g-4 mt-4 justify-content-center">
+      <div class="col-sm-6 col-lg-3" data-reveal="0"><div class="team-card"><div class="team-avatar" style="background:var(--gold-subtle);color:var(--gold);">Y</div><div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;">Yamen</div><div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem;">Lead Developer & Designer</div><div class="d-flex justify-content-center gap-2 mt-2"><a href="#" class="social-icon" style="width:30px;height:30px;font-size:0.8rem;"><i class="bi bi-linkedin"></i></a><a href="#" class="social-icon" style="width:30px;height:30px;font-size:0.8rem;"><i class="bi bi-github"></i></a></div></div></div>
+      <div class="col-sm-6 col-lg-3" data-reveal="100"><div class="team-card"><div class="team-avatar" style="background:rgba(52,211,153,0.12);color:#34d399;">A</div><div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;">Ahmad</div><div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem;">Backend & Systems</div><div class="d-flex justify-content-center gap-2 mt-2"><a href="#" class="social-icon" style="width:30px;height:30px;font-size:0.8rem;"><i class="bi bi-linkedin"></i></a><a href="#" class="social-icon" style="width:30px;height:30px;font-size:0.8rem;"><i class="bi bi-github"></i></a></div></div></div>
+      <div class="col-sm-6 col-lg-3" data-reveal="200"><div class="team-card"><div class="team-avatar" style="background:rgba(139,92,246,0.12);color:#a78bfa;">S</div><div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;">Sana</div><div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem;">UX Research & Testing</div><div class="d-flex justify-content-center gap-2 mt-2"><a href="#" class="social-icon" style="width:30px;height:30px;font-size:0.8rem;"><i class="bi bi-linkedin"></i></a><a href="#" class="social-icon" style="width:30px;height:30px;font-size:0.8rem;"><i class="bi bi-twitter-x"></i></a></div></div></div>
+      <div class="col-sm-6 col-lg-3" data-reveal="300"><div class="team-card"><div class="team-avatar" style="background:rgba(244,114,182,0.12);color:#f472b6;">R</div><div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;">Rima</div><div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem;">Product & Strategy</div><div class="d-flex justify-content-center gap-2 mt-2"><a href="#" class="social-icon" style="width:30px;height:30px;font-size:0.8rem;"><i class="bi bi-linkedin"></i></a><a href="#" class="social-icon" style="width:30px;height:30px;font-size:0.8rem;"><i class="bi bi-twitter-x"></i></a></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" data-reveal="0">
+  <div class="cta-bg"></div>
+  <div class="container position-relative text-center">
+    <div class="section-label mb-3">Join Us</div>
+    <h2 class="section-title mb-4">Be Part of the<br><em class="gradient-text">Campus Experience</em></h2>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="register.html" class="btn-gold btn-lg-custom"><i class="bi bi-person-plus"></i> Create Account</a>
+      <a href="events.html" class="btn-outline-gold btn-lg-custom"><i class="bi bi-compass"></i> Explore Events</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4"><div class="footer-brand gradient-text">◆ Najah Events</div><p class="footer-desc">The official event management platform of An-Najah National University.</p></div>
+      <div class="col-6 col-lg-2"><div class="footer-heading">Platform</div><a href="events.html" class="footer-link">Events</a><a href="venues.html" class="footer-link">Venues</a><a href="clubs.html" class="footer-link">Clubs</a></div>
+      <div class="col-6 col-lg-2"><div class="footer-heading">Account</div><a href="login.html" class="footer-link">Login</a><a href="register.html" class="footer-link">Register</a></div>
+      <div class="col-6 col-lg-2"><div class="footer-heading">Company</div><a href="about.html" class="footer-link">About</a><a href="#" class="footer-link">Contact</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 An-Najah National University</span><span>Built with ◆ for campus life</span></div>
+  </div>
+</footer>
+
+<style>
+  .cta-section { padding: 6rem 0; position: relative; overflow: hidden; }
+  .cta-bg { position: absolute; inset: 0; background: var(--bg-surface); background-image: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(201,168,76,0.08) 0%, transparent 70%); }
+  .cta-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0.4; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="global.js"></script>
+</body>
+</html>

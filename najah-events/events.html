@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<script>document.documentElement.setAttribute("data-theme",localStorage.getItem("najah_theme")||"dark");</script>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events — Najah Events</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="events.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand gradient-text" href="index.html"><span style="font-size:1.1rem;">◆</span> Najah Events</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav mx-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link active" href="events.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="venues.html">Venues</a></li>
+        <li class="nav-item"><a class="nav-link" href="clubs.html">Clubs</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      </ul>
+      <ul class="navbar-nav align-items-lg-center gap-1" id="navUserSlot"></ul>
+    </div>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <div class="section-label mb-2"><i class="bi bi-calendar-event me-1"></i> Events</div>
+    <h1 class="section-title" style="font-size:clamp(2rem,4vw,3rem);">Upcoming Events</h1>
+    <p style="color:var(--text-muted);margin-top:0.5rem;">Discover and register for campus events across all categories.</p>
+  </div>
+</div>
+
+<section class="section-py-sm">
+  <div class="container">
+    <!-- Filters -->
+    <div class="filter-bar glass-panel p-3 p-lg-4 mb-5">
+      <div class="row g-3 align-items-center">
+        <div class="col-lg-5">
+          <div class="input-group-dark">
+            <i class="bi bi-search ig-icon"></i>
+            <input id="searchInput" type="text" class="form-control-dark" placeholder="Search events, venues, dates…" style="padding-left:2.5rem;">
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+          <select id="categorySelect" class="form-select-dark">
+            <option value="all">All Categories</option>
+            <option value="expo">Expo</option>
+            <option value="conference">Conference</option>
+            <option value="workshop">Workshop</option>
+            <option value="festival">Festival</option>
+            <option value="sports">Sports</option>
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+          <select id="dateSelect" class="form-select-dark">
+            <option value="all">Any Time</option>
+            <option value="thisMonth">This Month</option>
+            <option value="nextMonth">Next Month</option>
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+          <select id="sortSelect" class="form-select-dark">
+            <option value="date">Sort: Date</option>
+            <option value="popular">Sort: Popular</option>
+            <option value="name">Sort: Name A-Z</option>
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-1">
+          <button id="clearBtn" class="btn-ghost w-100 justify-content-center"><i class="bi bi-x-lg"></i></button>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-3 flex-wrap mt-3" style="border-top:1px solid var(--border-subtle);padding-top:1rem;">
+        <span style="font-size:0.78rem;color:var(--text-muted);" id="resultCount"></span>
+        <div class="d-flex gap-2 ms-auto flex-wrap">
+          <button class="cat-pill active" data-cat="all">All</button>
+          <button class="cat-pill" data-cat="expo">Expo</button>
+          <button class="cat-pill" data-cat="conference">Conference</button>
+          <button class="cat-pill" data-cat="workshop">Workshop</button>
+          <button class="cat-pill" data-cat="festival">Festival</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="eventsGrid" class="row g-4"></div>
+
+    <div class="text-center mt-5">
+      <button id="loadMoreBtn" class="btn-outline-gold" style="display:none;">Load More <i class="bi bi-arrow-down ms-1"></i></button>
+    </div>
+    <div id="emptyState" class="empty-state" style="display:none;">
+      <i class="bi bi-calendar-x"></i>
+      <h5 style="color:var(--text-secondary);font-family:var(--font-display);">No events found</h5>
+      <p>Try adjusting your filters or search terms.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Registration Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dark">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title fw-600" style="font-family:var(--font-display);" id="modalEventTitle">Register for Event</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div id="modalEventInfo" class="glass-panel p-3 mb-4"></div>
+        <div class="mb-3"><label class="form-label-dark">Full Name</label><input type="text" class="form-control-dark" placeholder="Your full name" id="regName"></div>
+        <div class="mb-3"><label class="form-label-dark">Student ID / Email</label><input type="text" class="form-control-dark" placeholder="e.g. 202011234" id="regId"></div>
+        <div class="mb-3"><label class="form-label-dark">Role</label><select class="form-select-dark" id="regRole"><option>Student</option><option>Faculty</option><option>Company Representative</option></select></div>
+        <div class="mb-3"><label class="form-label-dark">Notes (optional)</label><textarea class="form-control-dark" rows="2" placeholder="Any special requirements…" id="regNotes"></textarea></div>
+      </div>
+      <div class="modal-footer"><button class="btn-ghost" data-bs-dismiss="modal">Cancel</button><button class="btn-gold" id="submitRegBtn"><i class="bi bi-check2 me-1"></i> Confirm Registration</button></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-bottom" style="border-top:none;padding-top:0;"><span>© 2026 An-Najah National University — Najah Events</span><a href="index.html" style="color:var(--text-muted);text-decoration:none;">← Back to Home</a></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="global.js"></script>
+<script src="events.js"></script>
+</body>
+</html>

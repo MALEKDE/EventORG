@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<script>document.documentElement.setAttribute("data-theme",localStorage.getItem("najah_theme")||"dark");</script>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — Najah Events</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="global.css">
+  <style>
+    .dash-layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - var(--nav-height));gap:0;}
+    @media(max-width:992px){.dash-layout{grid-template-columns:1fr;}}
+    .dash-sidebar{background:var(--bg-surface);border-right:1px solid var(--border-subtle);padding:2rem 1.5rem;position:sticky;top:var(--nav-height);height:calc(100vh - var(--nav-height));overflow-y:auto;}
+    @media(max-width:992px){.dash-sidebar{display:none;}}
+    .dash-main{padding:2.5rem;background:var(--bg-base);}
+    @media(max-width:768px){.dash-main{padding:1.5rem;}}
+    .sidebar-nav a{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;border-radius:var(--radius-sm);color:var(--text-muted);text-decoration:none;font-size:0.875rem;font-weight:500;transition:var(--transition);margin-bottom:0.25rem;}
+    .sidebar-nav a:hover{background:var(--bg-card);color:var(--text-primary);}
+    .sidebar-nav a.active{background:var(--gold-subtle);color:var(--gold);border:1px solid var(--border);}
+    .sidebar-nav a i{width:18px;text-align:center;}
+    .sidebar-section{font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin:1.5rem 0 0.6rem 1rem;}
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+    @media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:500px){.kpi-grid{grid-template-columns:1fr;}}
+    .kpi-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:1.5rem;}
+    .kpi-icon{width:44px;height:44px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1rem;}
+    .kpi-val{font-family:var(--font-display);font-size:2rem;font-weight:700;line-height:1;color:var(--text-primary);}
+    .kpi-lbl{font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;text-transform:uppercase;letter-spacing:0.06em;}
+    .tab-bar{display:flex;gap:0.5rem;border-bottom:1px solid var(--border-subtle);margin-bottom:2rem;overflow-x:auto;}
+    .tab-btn{padding:0.65rem 1.25rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-family:var(--font-body);font-size:0.875rem;font-weight:500;cursor:pointer;transition:var(--transition);white-space:nowrap;margin-bottom:-1px;}
+    .tab-btn:hover{color:var(--text-primary);}
+    .tab-btn.active{border-bottom-color:var(--gold);color:var(--gold);}
+    .tab-pane{display:none;} .tab-pane.show{display:block;}
+    .booking-row{display:flex;align-items:center;gap:1.25rem;padding:1.1rem 1.25rem;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);transition:var(--transition);}
+    .booking-row:hover{border-color:var(--border);}
+    .br-icon{width:44px;height:44px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+    .br-title{font-weight:600;font-size:0.9rem;color:var(--text-primary);line-height:1.3;}
+    .br-meta{font-size:0.77rem;color:var(--text-muted);margin-top:0.2rem;}
+    .notif-item{display:flex;gap:0.9rem;padding:0.9rem 0;border-bottom:1px solid var(--border-subtle);}
+    .notif-item:last-child{border-bottom:none;}
+    .ni-dot{width:8px;height:8px;border-radius:50%;margin-top:0.3rem;flex-shrink:0;}
+    .ni-text{font-size:0.84rem;color:var(--text-secondary);}
+    .ni-time{font-size:0.72rem;color:var(--text-muted);margin-top:0.2rem;}
+    .profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--gold-subtle);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2rem;font-family:var(--font-display);font-weight:700;color:var(--gold);}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand gradient-text" href="index.html"><span style="font-size:1.1rem;">◆</span> Najah Events</a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn-ghost" style="padding:0.4rem 0.9rem;font-size:0.82rem;" onclick="showToast('No new notifications', 'info')">
+        <i class="bi bi-bell"></i>
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:var(--gold);color:#080c14;border-radius:50%;font-size:0.6rem;font-weight:700;margin-left:0.3rem;">3</span>
+      </button>
+      <div id="navUserSlot" class="d-flex"></div>
+    </div>
+  </div>
+</nav>
+
+<div style="padding-top:var(--nav-height);">
+  <div class="dash-layout">
+    <!-- Sidebar -->
+    <aside class="dash-sidebar">
+      <div id="sidebarProfile" class="mb-3" style="padding:0.75rem;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);"></div>
+      <div class="sidebar-section">Main</div>
+      <nav class="sidebar-nav">
+        <a href="#" class="active" data-tab="overview"><i class="bi bi-grid-1x2"></i> Overview</a>
+        <a href="#" data-tab="bookings"><i class="bi bi-calendar2-check"></i> My Bookings</a>
+        <a href="#" data-tab="events"><i class="bi bi-ticket-perforated"></i> My Events</a>
+        <a href="#" data-tab="notifications"><i class="bi bi-bell"></i> Notifications</a>
+      </nav>
+      <div class="sidebar-section">Quick Links</div>
+      <nav class="sidebar-nav">
+        <a href="events.html"><i class="bi bi-compass"></i> Explore Events</a>
+        <a href="venues.html"><i class="bi bi-building"></i> Browse Venues</a>
+        <a href="reserve.html"><i class="bi bi-plus-circle"></i> New Booking</a>
+        <a href="clubs.html"><i class="bi bi-people"></i> Clubs</a>
+      </nav>
+      <div class="sidebar-section">Account</div>
+      <nav class="sidebar-nav">
+        <a href="#" data-tab="profile"><i class="bi bi-person-circle"></i> Profile</a>
+        <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right" style="color:#f87171;"></i> <span style="color:#f87171;">Logout</span></a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="dash-main">
+      <div id="dashOverview" class="tab-pane show">
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+          <div>
+            <h2 style="font-family:var(--font-display);font-size:1.9rem;margin-bottom:0.2rem;" id="dashGreeting">Good morning!</h2>
+            <p style="color:var(--text-muted);font-size:0.875rem;">Here's what's happening with your account.</p>
+          </div>
+          <a href="reserve.html" class="btn-gold"><i class="bi bi-plus me-1"></i> New Booking</a>
+        </div>
+
+        <div class="kpi-grid" id="kpiGrid"></div>
+
+        <div class="row g-4">
+          <div class="col-lg-7">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h6 style="font-family:var(--font-display);font-size:1rem;font-weight:700;">Recent Bookings</h6>
+              <a href="#" class="btn-ghost" style="padding:0.3rem 0.8rem;font-size:0.78rem;" onclick="switchTab('bookings')">View all</a>
+            </div>
+            <div id="recentBookings" class="d-flex flex-column gap-2"></div>
+          </div>
+          <div class="col-lg-5">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h6 style="font-family:var(--font-display);font-size:1rem;font-weight:700;">Notifications</h6>
+              <button class="btn-ghost" style="padding:0.3rem 0.8rem;font-size:0.78rem;" onclick="clearNotifs()">Clear all</button>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:1.25rem;" id="notifsWidget"></div>
+          </div>
+        </div>
+
+        <!-- Upcoming events -->
+        <div class="mt-4">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 style="font-family:var(--font-display);font-size:1rem;font-weight:700;">Upcoming Events You Might Like</h6>
+            <a href="events.html" class="btn-ghost" style="padding:0.3rem 0.8rem;font-size:0.78rem;">See all</a>
+          </div>
+          <div class="row g-3" id="suggestedEvents"></div>
+        </div>
+      </div>
+
+      <!-- Bookings Tab -->
+      <div id="dashBookings" class="tab-pane">
+        <h4 style="font-family:var(--font-display);margin-bottom:1.5rem;">My Venue Bookings</h4>
+        <div class="tab-bar">
+          <button class="tab-btn active" data-bfilter="all">All</button>
+          <button class="tab-btn" data-bfilter="pending">Pending</button>
+          <button class="tab-btn" data-bfilter="approved">Approved</button>
+          <button class="tab-btn" data-bfilter="rejected">Rejected</button>
+        </div>
+        <div id="bookingsList" class="d-flex flex-column gap-2"></div>
+        <div id="bookingsEmpty" class="empty-state" style="display:none;"><i class="bi bi-calendar-x"></i><h5 style="font-family:var(--font-display);color:var(--text-secondary);">No bookings yet</h5><p>Start by <a href="reserve.html" style="color:var(--gold);">booking a venue</a></p></div>
+      </div>
+
+      <!-- Events Tab -->
+      <div id="dashEvents" class="tab-pane">
+        <h4 style="font-family:var(--font-display);margin-bottom:1.5rem;">Registered Events</h4>
+        <div id="myEventsList" class="row g-3"></div>
+        <div id="eventsEmpty" class="empty-state" style="display:none;"><i class="bi bi-ticket-perforated"></i><h5 style="font-family:var(--font-display);color:var(--text-secondary);">No events registered</h5><p><a href="events.html" style="color:var(--gold);">Explore events</a></p></div>
+      </div>
+
+      <!-- Notifications Tab -->
+      <div id="dashNotifications" class="tab-pane">
+        <h4 style="font-family:var(--font-display);margin-bottom:1.5rem;">All Notifications</h4>
+        <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:1.5rem;" id="allNotifs"></div>
+      </div>
+
+      <!-- Profile Tab -->
+      <div id="dashProfile" class="tab-pane">
+        <h4 style="font-family:var(--font-display);margin-bottom:1.5rem;">My Profile</h4>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:2rem;text-align:center;">
+              <div class="profile-avatar mx-auto mb-3" id="profAvatar"></div>
+              <div style="font-family:var(--font-display);font-size:1.25rem;font-weight:700;" id="profName"></div>
+              <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.25rem;" id="profRole"></div>
+              <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.15rem;" id="profEmail"></div>
+              <hr style="border-color:var(--border-subtle);margin:1.25rem 0;">
+              <a href="#" onclick="logout()" style="color:#f87171;font-size:0.83rem;text-decoration:none;"><i class="bi bi-box-arrow-right me-1"></i>Logout</a>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:2rem;">
+              <h6 style="font-family:var(--font-display);margin-bottom:1.5rem;">Edit Profile</h6>
+              <div class="row g-3">
+                <div class="col-6"><label class="form-label-dark">Full Name</label><input type="text" class="form-control-dark" id="editName"></div>
+                <div class="col-6"><label class="form-label-dark">Email</label><input type="email" class="form-control-dark" id="editEmail"></div>
+                <div class="col-6"><label class="form-label-dark">Phone</label><input type="tel" class="form-control-dark" placeholder="+970 5xx xxx xxxx"></div>
+                <div class="col-6"><label class="form-label-dark">Faculty / Department</label><input type="text" class="form-control-dark" placeholder="e.g. Computer Science"></div>
+                <div class="col-12 text-end"><button class="btn-gold" onclick="saveProfile()"><i class="bi bi-check2 me-1"></i>Save Changes</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="global.js"></script>
+<script>
+const user = getCurrentUser();
+if (!user) { window.location.href = 'login.html'; }
+
+const SAMPLE_BOOKINGS = [
+  {ref:'NE-AABB1',eventName:'Career Expo 2026',venue:'Main Auditorium',date:'2026-04-12',status:'approved'},
+  {ref:'NE-BBCC2',eventName:'Hackathon Night',venue:'Computer Lab 2',date:'2026-04-20',status:'pending'},
+  {ref:'NE-CCDD3',eventName:'Club Meeting',venue:'Workshop Room A',date:'2026-03-30',status:'rejected'},
+];
+const SAMPLE_NOTIFS = [
+  {text:'Your booking NE-AABB1 has been approved!',time:'2 hours ago',color:'#34d399',icon:'bi-check-circle-fill'},
+  {text:'Career Expo 2026 is tomorrow — Don\'t forget!',time:'1 day ago',color:'var(--gold)',icon:'bi-calendar-event-fill'},
+  {text:'New event: Spring Cultural Festival is now open.',time:'3 days ago',color:'#a78bfa',icon:'bi-megaphone-fill'},
+];
+const SAMPLE_EVENTS = [
+  {title:'TechTalk Summit',date:'Apr 5',venue:'Engineering Hall',img:'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=300&q=80',cat:'Conference'},
+  {title:'Projects Fair',date:'May 1',venue:'Expo Hall',img:'https://images.unsplash.com/photo-1558008258-3256797b43f3?w=300&q=80',cat:'Workshop'},
+  {title:'Spring Festival',date:'May 15',venue:'Outdoor Stage',img:'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=300&q=80',cat:'Festival'},
+];
+
+function getBookings() {
+  const stored = JSON.parse(localStorage.getItem('najah_bookings')||'[]');
+  return [...SAMPLE_BOOKINGS, ...stored.map(b => ({...b, eventName:b.eventName||'Custom Event', venue:'Selected Venue'}))];
+}
+
+function getRegistrations() {
+  return JSON.parse(localStorage.getItem('najah_registrations')||'[]');
+}
+
+// Greeting
+const hour = new Date().getHours();
+const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+const nameStr = user ? user.name || 'Student' : 'Guest';
+document.getElementById('dashGreeting').textContent = greet + ', ' + nameStr.split(' ')[0] + '!';
+
+// Sidebar profile
+document.getElementById('sidebarProfile').innerHTML = `
+  <div style="display:flex;align-items:center;gap:0.75rem;">
+    <div style="width:40px;height:40px;border-radius:50%;background:var(--gold-subtle);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem;font-family:var(--font-display);font-weight:700;color:var(--gold);flex-shrink:0;">${(nameStr[0]||'U').toUpperCase()}</div>
+    <div><div style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">${nameStr}</div><div style="font-size:0.72rem;color:var(--text-muted);text-transform:capitalize;">${user?.role||'Student'}</div></div>
+  </div>`;
+
+// KPIs
+const bookings = getBookings();
+const approved = bookings.filter(b=>b.status==='approved').length;
+const pending = bookings.filter(b=>b.status==='pending').length;
+const regs = getRegistrations();
+document.getElementById('kpiGrid').innerHTML = [
+  {icon:'bi-calendar2-check',bg:'var(--gold-subtle)',ic:'var(--gold)',val:bookings.length,lbl:'Total Bookings'},
+  {icon:'bi-check-circle',bg:'rgba(52,211,153,0.1)',ic:'#34d399',val:approved,lbl:'Approved'},
+  {icon:'bi-clock-history',bg:'rgba(251,191,36,0.1)',ic:'#fbbf24',val:pending,lbl:'Pending'},
+  {icon:'bi-ticket-perforated',bg:'rgba(139,92,246,0.1)',ic:'#a78bfa',val:regs.length,lbl:'Events Joined'},
+].map(k=>`<div class="kpi-card"><div class="kpi-icon" style="background:${k.bg};color:${k.ic};"><i class="bi ${k.icon}"></i></div><div class="kpi-val">${k.val}</div><div class="kpi-lbl">${k.lbl}</div></div>`).join('');
+
+// Recent bookings
+function renderBookingRow(b) {
+  const statusMap = {approved:'<span class="badge-available">Approved</span>',pending:'<span class="badge-busy">Pending</span>',rejected:'<span class="badge-maintenance">Rejected</span>'};
+  const iconMap = {approved:{bg:'rgba(52,211,153,0.1)',ic:'#34d399',i:'bi-check2'},pending:{bg:'rgba(251,191,36,0.1)',ic:'#fbbf24',i:'bi-clock'},rejected:{bg:'rgba(248,113,113,0.1)',ic:'#f87171',i:'bi-x'}};
+  const s = iconMap[b.status]||iconMap.pending;
+  const dateStr = b.date ? new Date(b.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+  return `<div class="booking-row"><div class="br-icon" style="background:${s.bg};color:${s.ic};"><i class="bi ${s.i}"></i></div><div class="flex-grow-1"><div class="br-title">${b.eventName||'Unnamed Event'}</div><div class="br-meta"><i class="bi bi-building me-1"></i>${b.venue||'—'} · ${dateStr} · <span style="color:var(--text-muted);font-size:0.7rem;">${b.ref||''}</span></div></div>${statusMap[b.status]||''}</div>`;
+}
+
+document.getElementById('recentBookings').innerHTML = bookings.slice(0,3).map(renderBookingRow).join('') || '<div class="empty-state" style="padding:2rem;"><i class="bi bi-calendar-x"></i><p>No bookings yet</p></div>';
+
+// Notifs widget
+function renderNotif(n) {
+  return `<div class="notif-item"><div class="ni-dot" style="background:${n.color};"></div><div><div class="ni-text"><i class="bi ${n.icon} me-1" style="color:${n.color};"></i>${n.text}</div><div class="ni-time">${n.time}</div></div></div>`;
+}
+document.getElementById('notifsWidget').innerHTML = SAMPLE_NOTIFS.map(renderNotif).join('');
+document.getElementById('allNotifs').innerHTML = SAMPLE_NOTIFS.map(renderNotif).join('');
+
+function clearNotifs() {
+  document.getElementById('notifsWidget').innerHTML = '<div style="text-align:center;padding:1rem;font-size:0.85rem;color:var(--text-muted);">All caught up! ✓</div>';
+  showToast('Notifications cleared', 'info');
+}
+
+// Suggested events
+document.getElementById('suggestedEvents').innerHTML = SAMPLE_EVENTS.map(e=>`
+  <div class="col-md-4">
+    <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;transition:var(--transition);" onmouseover="this.style.borderColor='var(--border)'" onmouseout="this.style.borderColor='var(--border-subtle)'">
+      <img src="${e.img}" style="width:100%;height:130px;object-fit:cover;" alt="">
+      <div style="padding:1rem;">
+        <div class="badge-category" style="font-size:0.65rem;margin-bottom:0.5rem;">${e.cat}</div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:0.9rem;margin-bottom:0.25rem;">${e.title}</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);">${e.date} · ${e.venue}</div>
+        <a href="events.html" class="btn-gold mt-2 w-100 justify-content-center" style="font-size:0.78rem;padding:0.4rem;">Register</a>
+      </div>
+    </div>
+  </div>`).join('');
+
+// Bookings tab
+document.getElementById('bookingsList').innerHTML = bookings.map(renderBookingRow).join('');
+if (!bookings.length) document.getElementById('bookingsEmpty').style.display='block';
+
+// Events tab
+const myRegs = getRegistrations();
+if (myRegs.length) {
+  document.getElementById('myEventsList').innerHTML = myRegs.map(r=>`
+    <div class="col-md-6">
+      <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1.1rem;display:flex;align-items:center;gap:1rem;">
+        <div style="width:44px;height:44px;background:rgba(139,92,246,0.1);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:#a78bfa;flex-shrink:0;"><i class="bi bi-ticket-perforated"></i></div>
+        <div><div style="font-weight:600;font-size:0.9rem;">${r.eventTitle||'Event'}</div><div style="font-size:0.75rem;color:var(--text-muted);">Registered · ${new Date(r.date||Date.now()).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div></div>
+        <span class="badge-available ms-auto">Confirmed</span>
+      </div>
+    </div>`).join('');
+} else { document.getElementById('eventsEmpty').style.display='block'; }
+
+// Profile
+if (user) {
+  document.getElementById('profAvatar').textContent = (user.name||'U')[0].toUpperCase();
+  document.getElementById('profName').textContent = user.name||'User';
+  document.getElementById('profRole').textContent = (user.role||'student').charAt(0).toUpperCase() + (user.role||'student').slice(1);
+  document.getElementById('profEmail').textContent = user.email||'';
+  document.getElementById('editName').value = user.name||'';
+  document.getElementById('editEmail').value = user.email||'';
+}
+
+function saveProfile() {
+  const u = getCurrentUser();
+  u.name = document.getElementById('editName').value;
+  u.email = document.getElementById('editEmail').value;
+  setCurrentUser(u);
+  showToast('Profile updated!', 'success');
+  document.getElementById('profName').textContent = u.name;
+  document.getElementById('profEmail').textContent = u.email;
+}
+
+// Tabs
+function switchTab(name) {
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('show'));
+  document.getElementById('dash' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('show');
+  document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(a=>{a.classList.remove('active');if(a.dataset.tab===name)a.classList.add('active');});
+}
+document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();switchTab(a.dataset.tab);}));
+
+// Booking filter tabs
+document.querySelectorAll('[data-bfilter]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('[data-bfilter]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const f=btn.dataset.bfilter;
+    const filtered=f==='all'?bookings:bookings.filter(b=>b.status===f);
+    document.getElementById('bookingsList').innerHTML=filtered.length?filtered.map(renderBookingRow).join(''):'<div class="empty-state"><i class="bi bi-inbox"></i><p>No bookings with this status</p></div>';
+  });
+});
+</script>
+</body>
+</html>
