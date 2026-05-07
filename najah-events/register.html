@@ -144,8 +144,20 @@ function goStep(n) {
     document.getElementById('orgRow').style.display = isCompanyOrClub ? 'block' : 'none';
   }
   if (n === 3) {
-    if (!document.getElementById('remail').value.trim() || !document.getElementById('fname').value.trim()) {
-      showToast('Please fill required fields', 'error'); return;
+    const firstName = document.getElementById('fname').value.trim();
+    const lastName = document.getElementById('lname').value.trim();
+    const email = document.getElementById('remail').value.trim();
+    const role = document.querySelector('input[name="role"]:checked')?.value || 'student';
+    const orgName = document.getElementById('rorg').value.trim();
+
+    if (!firstName || !lastName || !email) {
+      showToast('Please fill required fields', 'error');
+      return;
+    }
+
+    if ((role === 'company' || role === 'club') && !orgName) {
+      showToast('Please enter organization name', 'error');
+      return;
     }
   }
   document.getElementById('step' + currentStep).classList.remove('show');
@@ -194,23 +206,92 @@ function toggleEye(inputId, btn) {
   else { inp.type = 'password'; icon.className = 'bi bi-eye'; }
 }
 
-document.getElementById('createBtn').addEventListener('click', () => {
+function normalizeUser(user) {
+  return {
+    user_id: user.user_id,
+    id: user.student_id || user.user_id,
+    name: user.full_name || user.name || 'User',
+    full_name: user.full_name || user.name || 'User',
+    email: user.email,
+    role: user.role,
+    phone: user.phone || '',
+    student_id: user.student_id || '',
+    organization_name: user.organization_name || ''
+  };
+}
+
+async function createAccount() {
   const pass = document.getElementById('rpass').value;
   const pass2 = document.getElementById('rpass2').value;
   const agree = document.getElementById('agreeTerms').checked;
+  const role = document.querySelector('input[name="role"]:checked')?.value || 'student';
+  const fullName = (document.getElementById('fname').value + ' ' + document.getElementById('lname').value).trim();
+  const email = document.getElementById('remail').value.trim();
+  const phone = document.getElementById('rphone').value.trim();
+  const studentId = document.getElementById('rstudentId').value.trim();
+  const orgName = document.getElementById('rorg').value.trim();
+
+  if (!fullName || !email) { showToast('Please fill required fields', 'error'); return; }
+  if ((role === 'company' || role === 'club') && !orgName) { showToast('Please enter organization name', 'error'); return; }
   if (!pass || pass.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
   if (pass !== pass2) { showToast('Passwords do not match', 'error'); return; }
   if (!agree) { showToast('Please agree to the terms', 'error'); return; }
-  const role = document.querySelector('input[name="role"]:checked')?.value || 'student';
-  const user = {
-    name: (document.getElementById('fname').value + ' ' + document.getElementById('lname').value).trim(),
-    email: document.getElementById('remail').value.trim(),
-    role, id: 'USR' + Date.now()
-  };
-  setCurrentUser(user);
-  showToast('Account created! Welcome, ' + user.name + ' 🎉', 'success');
-  setTimeout(() => window.location.href = 'dashboard.html', 1200);
-});
+
+  const createBtn = document.getElementById('createBtn');
+  const oldHtml = createBtn.innerHTML;
+  createBtn.disabled = true;
+  createBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+
+  try {
+    const response = await fetch('backend/auth/register.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        full_name: fullName,
+        email: email,
+        password: pass,
+        confirm_password: pass2,
+        role: role,
+        phone: phone,
+        student_id: studentId,
+        organization_name: orgName
+      })
+    });
+
+    const text = await response.text();
+    let result;
+
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      console.error('Invalid PHP response:', text);
+      showToast('Backend returned an invalid response. Check PHP errors or database connection.', 'error');
+      return;
+    }
+
+    if (!result.success) {
+      showToast(result.message || 'Registration failed', 'error');
+      return;
+    }
+
+    const user = normalizeUser(result.data.user);
+    setCurrentUser(user);
+    showToast('Account created! Welcome, ' + user.name + ' 🎉', 'success');
+
+    setTimeout(() => {
+      window.location.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+    }, 700);
+
+  } catch (error) {
+    console.error(error);
+    showToast('Connection error. Open this page using localhost and make sure Apache/MySQL are running.', 'error');
+  } finally {
+    createBtn.disabled = false;
+    createBtn.innerHTML = oldHtml;
+  }
+}
+
+document.getElementById('createBtn').addEventListener('click', createAccount);
 </script>
 </body>
 </html>

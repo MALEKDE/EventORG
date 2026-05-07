@@ -1,0 +1,15 @@
+Admin:
+email: admin@najah.edu
+password: admin123
+
+Student:
+email: student@najah.edu
+password: demo123
+
+Club:
+email: club@najah.edu
+password: demo123
+
+Company:
+email: hr@techcorp.com
+password: demo123

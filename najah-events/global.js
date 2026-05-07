@@ -177,7 +177,12 @@ function showToast(msg,type='success'){
 /* ── Auth ── */
 function getCurrentUser(){try{return JSON.parse(localStorage.getItem('najah_user')||'null');}catch{return null;}}
 function setCurrentUser(u){localStorage.setItem('najah_user',JSON.stringify(u));}
-function logout(){localStorage.removeItem('najah_user');window.location.href='index.html';}
+function logout(){
+  fetch('backend/auth/logout.php',{method:'POST'}).catch(()=>{}).finally(()=>{
+    localStorage.removeItem('najah_user');
+    window.location.href='index.html';
+  });
+}
 
 /* ── Nav User ── */
 function renderNavUser() {

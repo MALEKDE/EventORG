@@ -88,11 +88,93 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="global.js"></script>
 <script>
-const DEMO_USERS = [
-  {email:'student@najah.edu',password:'demo123',name:'Ahmad Khalil',role:'student',id:'202011234'},
-  {email:'admin@najah.edu',password:'admin123',name:'Events Admin',role:'admin',id:'STAFF001'},
-  {email:'club@najah.edu',password:'demo123',name:'Sana Haddad',role:'club',id:'CLUB002'},
-];
+const DEMO_ACCOUNTS = {
+  student: { email: 'student@najah.edu', password: 'demo123' },
+  admin: { email: 'admin@najah.edu', password: 'admin123' },
+  club: { email: 'club@najah.edu', password: 'demo123' },
+  company: { email: 'hr@techcorp.com', password: 'demo123' }
+};
+
+const loginBtn = document.getElementById('loginBtn');
+const loginEmail = document.getElementById('loginEmail');
+const loginPass = document.getElementById('loginPass');
+const loginError = document.getElementById('loginError');
+
+function showLoginError(message) {
+  loginError.textContent = message;
+  loginError.style.display = 'block';
+}
+
+function clearLoginError() {
+  loginError.textContent = '';
+  loginError.style.display = 'none';
+}
+
+function normalizeUser(user) {
+  return {
+    user_id: user.user_id,
+    id: user.student_id || user.user_id,
+    name: user.full_name || user.name || 'User',
+    full_name: user.full_name || user.name || 'User',
+    email: user.email,
+    role: user.role,
+    phone: user.phone || '',
+    student_id: user.student_id || '',
+    organization_name: user.organization_name || ''
+  };
+}
+
+async function tryLogin(email, password) {
+  clearLoginError();
+
+  if (!email || !password) {
+    showToast('Please fill all fields', 'error');
+    return;
+  }
+
+  loginBtn.disabled = true;
+  const oldHtml = loginBtn.innerHTML;
+  loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
+
+  try {
+    const response = await fetch('backend/auth/login.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const text = await response.text();
+    let result;
+
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      console.error('Invalid PHP response:', text);
+      showLoginError('Backend returned an invalid response. Check PHP errors or database connection.');
+      return;
+    }
+
+    if (!result.success) {
+      showLoginError(result.message || 'Invalid email or password.');
+      return;
+    }
+
+    const user = normalizeUser(result.data.user);
+    setCurrentUser(user);
+    showToast('Welcome back, ' + user.name + '!', 'success');
+
+    setTimeout(() => {
+      window.location.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+    }, 500);
+
+  } catch (error) {
+    console.error(error);
+    showLoginError('Connection error. Open this page using localhost and make sure Apache/MySQL are running.');
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = oldHtml;
+  }
+}
 
 document.getElementById('eyeBtn').addEventListener('click', () => {
   const inp = document.getElementById('loginPass');
@@ -101,36 +183,24 @@ document.getElementById('eyeBtn').addEventListener('click', () => {
   else { inp.type='password'; icon.className='bi bi-eye'; }
 });
 
-function tryLogin(email, password) {
-  const user = DEMO_USERS.find(u => u.email === email.toLowerCase() && u.password === password);
-  if (user) {
-    setCurrentUser(user);
-    showToast('Welcome back, ' + user.name + '!', 'success');
-    setTimeout(() => window.location.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html', 1000);
-  } else {
-    const err = document.getElementById('loginError');
-    err.textContent = 'Invalid email or password. Try demo accounts below.';
-    err.style.display = 'block';
-  }
-}
-
-document.getElementById('loginBtn').addEventListener('click', () => {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  if (!email || !pass) { showToast('Please fill all fields', 'error'); return; }
-  tryLogin(email, pass);
+loginBtn.addEventListener('click', () => {
+  tryLogin(loginEmail.value.trim(), loginPass.value);
 });
 
-document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); });
+loginPass.addEventListener('keydown', e => {
+  if (e.key === 'Enter') loginBtn.click();
+});
+
+loginEmail.addEventListener('keydown', e => {
+  if (e.key === 'Enter') loginBtn.click();
+});
 
 function demoLogin(role) {
-  const user = DEMO_USERS.find(u => u.role === role) || DEMO_USERS[0];
-  document.getElementById('loginEmail').value = user.email;
-  document.getElementById('loginPass').value = user.password;
-  setTimeout(() => tryLogin(user.email, user.password), 400);
+  const account = DEMO_ACCOUNTS[role] || DEMO_ACCOUNTS.student;
+  loginEmail.value = account.email;
+  loginPass.value = account.password;
+  setTimeout(() => tryLogin(account.email, account.password), 250);
 }
-
-if (getCurrentUser()) window.location.href = 'dashboard.html';
 </script>
 </body>
 </html>
