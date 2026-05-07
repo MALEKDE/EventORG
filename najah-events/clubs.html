@@ -1,31 +1,230 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<script>document.documentElement.setAttribute("data-theme",localStorage.getItem("najah_theme")||"dark");</script>
-  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script>
+    document.documentElement.setAttribute("data-theme", localStorage.getItem("najah_theme") || "dark");
+  </script>
+
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Clubs — Najah Events</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="global.css">
+
   <style>
-    .club-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);overflow:hidden;height:100%;transition:var(--transition);}
-    .club-card:hover{transform:translateY(-4px);border-color:var(--border);box-shadow:var(--shadow-deep),var(--shadow-gold);}
-    .club-banner{height:130px;background-size:cover;background-position:center;position:relative;}
-    .club-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(8,12,20,0.7),transparent);}
-    .club-avatar{width:60px;height:60px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:1.5rem;border:3px solid var(--bg-card);position:absolute;bottom:-1.8rem;left:1.25rem;z-index:1;}
-    .club-body{padding:2.5rem 1.25rem 1.25rem;}
-    .club-name{font-family:var(--font-display);font-size:1.05rem;font-weight:700;margin-bottom:0.2rem;}
-    .club-category{font-size:0.72rem;color:var(--text-muted);margin-bottom:0.6rem;}
-    .club-desc{font-size:0.82rem;color:var(--text-muted);line-height:1.6;margin-bottom:1rem;}
-    .club-stats{display:flex;gap:1rem;font-size:0.75rem;color:var(--text-secondary);}
-    .cat-filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:2rem;}
+    .club-card{
+      background:var(--bg-card);
+      border:1px solid var(--border-subtle);
+      border-radius:var(--radius-xl);
+      overflow:hidden;
+      height:100%;
+      transition:var(--transition);
+      position:relative;
+    }
+
+    .club-card:hover{
+      transform:translateY(-6px);
+      border-color:rgba(201,168,76,0.45);
+      box-shadow:var(--shadow-deep),var(--shadow-gold);
+    }
+
+    .club-banner{
+      height:140px;
+      background-size:cover;
+      background-position:center;
+      position:relative;
+    }
+
+    .club-banner::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(to top,rgba(8,12,20,0.78),rgba(8,12,20,0.08));
+    }
+
+    .club-avatar{
+      width:62px;
+      height:62px;
+      border-radius:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.55rem;
+      border:4px solid var(--bg-card);
+      position:absolute;
+      bottom:-1.9rem;
+      left:1.25rem;
+      z-index:2;
+      box-shadow:0 14px 30px rgba(0,0,0,0.18);
+    }
+
+    .club-body{
+      padding:2.7rem 1.25rem 1.25rem;
+    }
+
+    .club-name{
+      font-family:var(--font-display);
+      font-size:1.08rem;
+      font-weight:700;
+      margin-bottom:0.35rem;
+      color:var(--text-primary);
+    }
+
+    .club-category{
+      margin-bottom:0.75rem;
+    }
+
+    .club-desc{
+      font-size:0.84rem;
+      color:var(--text-muted);
+      line-height:1.65;
+      margin-bottom:1rem;
+      min-height:70px;
+    }
+
+    .club-stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:0.75rem;
+      font-size:0.76rem;
+      color:var(--text-secondary);
+      margin-bottom:1rem;
+    }
+
+    .club-stats span{
+      display:inline-flex;
+      align-items:center;
+      gap:0.25rem;
+    }
+
+    .cat-filter-bar{
+      display:flex;
+      gap:0.7rem;
+      flex-wrap:wrap;
+      margin-bottom:2.25rem;
+    }
+
+    .cat-pill{
+      border:1px solid var(--border-subtle);
+      background:var(--bg-card);
+      color:var(--text-secondary);
+      border-radius:999px;
+      padding:0.62rem 1rem;
+      font-size:0.78rem;
+      font-weight:700;
+      letter-spacing:0.03em;
+      line-height:1;
+      display:inline-flex;
+      align-items:center;
+      gap:0.45rem;
+      box-shadow:0 10px 25px rgba(0,0,0,0.04);
+      transition:var(--transition);
+    }
+
+    .cat-pill::before{
+      content:'';
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:var(--text-muted);
+      opacity:0.6;
+      transition:var(--transition);
+    }
+
+    .cat-pill:hover{
+      transform:translateY(-2px);
+      color:var(--gold);
+      border-color:rgba(201,168,76,0.55);
+      box-shadow:0 16px 35px rgba(201,168,76,0.12);
+    }
+
+    .cat-pill.active{
+      color:#111827;
+      border-color:transparent;
+      background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+      box-shadow:0 18px 38px rgba(201,168,76,0.24);
+    }
+
+    .cat-pill.active::before{
+      background:#111827;
+      opacity:1;
+    }
+
+    .club-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:0.75rem;
+      margin-top:1.1rem;
+    }
+
+    .club-btn{
+      border:none;
+      border-radius:16px;
+      padding:0.78rem 0.95rem;
+      font-size:0.8rem;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:0.45rem;
+      transition:var(--transition);
+      white-space:nowrap;
+    }
+
+    .club-btn-view{
+      background:rgba(255,255,255,0.04);
+      color:var(--text-secondary);
+      border:1px solid var(--border-subtle);
+    }
+
+    .club-btn-view:hover{
+      color:var(--text-primary);
+      border-color:var(--border);
+      background:rgba(255,255,255,0.08);
+      transform:translateY(-2px);
+    }
+
+    .club-btn-join{
+      background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+      color:#111827;
+      box-shadow:0 14px 28px rgba(201,168,76,0.23);
+    }
+
+    .club-btn-join:hover{
+      transform:translateY(-2px);
+      box-shadow:0 18px 38px rgba(201,168,76,0.34);
+    }
+
+    @media (max-width:576px){
+      .cat-filter-bar{
+        gap:0.5rem;
+      }
+
+      .cat-pill{
+        padding:0.55rem 0.85rem;
+        font-size:0.72rem;
+      }
+
+      .club-actions{
+        grid-template-columns:1fr;
+      }
+    }
   </style>
 </head>
+
 <body>
 <nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
   <div class="container">
-    <a class="navbar-brand gradient-text" href="index.html"><span style="font-size:1.1rem;">◆</span> Najah Events</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
+    <a class="navbar-brand gradient-text" href="index.html">
+      <span style="font-size:1.1rem;">◆</span> Najah Events
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav mx-auto align-items-lg-center gap-lg-1">
         <li class="nav-item"><a class="nav-link" href="events.html">Events</a></li>
@@ -33,6 +232,7 @@
         <li class="nav-item"><a class="nav-link active" href="clubs.html">Clubs</a></li>
         <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
       </ul>
+
       <ul class="navbar-nav align-items-lg-center gap-1" id="navUserSlot"></ul>
     </div>
   </div>
@@ -40,67 +240,200 @@
 
 <div class="page-hero">
   <div class="container">
-    <div class="section-label mb-2"><i class="bi bi-people me-1"></i> Clubs</div>
-    <h1 class="section-title" style="font-size:clamp(2rem,4vw,3rem);">University Clubs</h1>
-    <p style="color:var(--text-muted);margin-top:0.5rem;max-width:520px;">Explore active student organizations, join a community that matches your interests, and get involved in campus life.</p>
+    <div class="section-label mb-2">
+      <i class="bi bi-people me-1"></i> Clubs
+    </div>
+
+    <h1 class="section-title" style="font-size:clamp(2rem,4vw,3rem);">
+      University Clubs
+    </h1>
+
+    <p style="color:var(--text-muted);margin-top:0.5rem;max-width:520px;">
+      Explore active student organizations, join a community that matches your interests, and get involved in campus life.
+    </p>
   </div>
 </div>
 
 <section class="section-py-sm">
   <div class="container">
+
     <div class="d-flex flex-wrap gap-3 align-items-center mb-4">
       <div class="input-group-dark" style="position:relative;max-width:320px;width:100%;">
         <i class="bi bi-search" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.9rem;pointer-events:none;"></i>
         <input type="text" class="form-control-dark" id="clubSearch" placeholder="Search clubs…" style="padding-left:2.6rem;">
       </div>
+
       <div style="font-size:0.78rem;color:var(--text-muted);" id="clubCount"></div>
     </div>
+
     <div class="cat-filter-bar" id="catBar"></div>
+
     <div class="row g-4" id="clubsGrid"></div>
-    <div id="clubsEmpty" class="empty-state" style="display:none;"><i class="bi bi-people"></i><h5 style="font-family:var(--font-display);color:var(--text-secondary);">No clubs found</h5><p>Try a different search.</p></div>
+
+    <div id="clubsEmpty" class="empty-state" style="display:none;">
+      <i class="bi bi-people"></i>
+      <h5 style="font-family:var(--font-display);color:var(--text-secondary);">No clubs found</h5>
+      <p>Try a different search.</p>
+    </div>
+
   </div>
 </section>
 
-<!-- Join Modal -->
 <div class="modal fade modal-dark" id="joinModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title" style="font-family:var(--font-display);" id="joinTitle">Join Club</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-family:var(--font-display);" id="joinTitle">Join Club</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
       <div class="modal-body">
         <p style="color:var(--text-muted);font-size:0.875rem;" id="joinDesc"></p>
-        <div class="mb-3"><label class="form-label-dark">Your Name</label><input type="text" class="form-control-dark" id="joinName" placeholder="Full name"></div>
-        <div class="mb-3"><label class="form-label-dark">Student ID</label><input type="text" class="form-control-dark" id="joinId" placeholder="e.g. 202011234"></div>
-        <div class="mb-3"><label class="form-label-dark">Why do you want to join?</label><textarea class="form-control-dark" rows="2" id="joinReason" placeholder="Brief motivation…"></textarea></div>
+
+        <div class="mb-3">
+          <label class="form-label-dark">Your Name</label>
+          <input type="text" class="form-control-dark" id="joinName" placeholder="Full name">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label-dark">Student ID</label>
+          <input type="text" class="form-control-dark" id="joinId" placeholder="e.g. 12323343">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label-dark">Why do you want to join?</label>
+          <textarea class="form-control-dark" rows="2" id="joinReason" placeholder="Brief motivation…"></textarea>
+        </div>
       </div>
-      <div class="modal-footer"><button class="btn-ghost" data-bs-dismiss="modal">Cancel</button><button class="btn-gold" id="joinConfirm"><i class="bi bi-check2 me-1"></i>Submit Request</button></div>
+
+      <div class="modal-footer">
+        <button class="btn-ghost" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn-gold" id="joinConfirm">
+          <i class="bi bi-check2 me-1"></i>Submit Request
+        </button>
+      </div>
+
     </div>
   </div>
 </div>
 
-<footer><div class="container"><div class="footer-bottom" style="border-top:none;padding-top:0;"><span>© 2026 An-Najah National University — Najah Events</span><a href="index.html" style="color:var(--text-muted);text-decoration:none;">← Home</a></div></div></footer>
+<footer>
+  <div class="container">
+    <div class="footer-bottom" style="border-top:none;padding-top:0;">
+      <span>© 2026 An-Najah National University — Najah Events</span>
+      <a href="index.html" style="color:var(--text-muted);text-decoration:none;">← Home</a>
+    </div>
+  </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="global.js"></script>
+
 <script>
 const CLUBS = [
-  {id:1,name:'Computer Science Club',category:'Technology',icon:'💻',color:'rgba(139,92,246,0.2)',members:142,events:8,img:'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&q=80',desc:'Fostering innovation and technical skills through workshops, hackathons, and coding challenges.'},
-  {id:2,name:'Engineering Innovation Club',category:'Engineering',icon:'⚙️',color:'rgba(201,168,76,0.2)',members:98,events:5,img:'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80',desc:'Bridging theoretical knowledge with real-world applications through hands-on engineering projects.'},
-  {id:3,name:'Cultural Heritage Society',category:'Culture',icon:'🏺',color:'rgba(244,114,182,0.2)',members:215,events:12,img:'https://images.unsplash.com/photo-1541535650810-10d26f5c2ab3?w=600&q=80',desc:'Celebrating and preserving Palestinian and Arab cultural heritage through arts, exhibitions, and events.'},
-  {id:4,name:'Business & Entrepreneurship Club',category:'Business',icon:'📈',color:'rgba(52,211,153,0.2)',members:176,events:9,img:'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600&q=80',desc:'Empowering student entrepreneurs with mentorship, pitch competitions, and startup resources.'},
-  {id:5,name:'Environmental Action Group',category:'Environment',icon:'🌿',color:'rgba(52,211,153,0.15)',members:87,events:6,img:'https://images.unsplash.com/photo-1569163139500-9b7e13aebbdb?w=600&q=80',desc:'Driving sustainability initiatives and environmental awareness on campus and beyond.'},
-  {id:6,name:'Photography & Media Club',category:'Arts',icon:'📷',color:'rgba(251,191,36,0.15)',members:63,events:4,img:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80',desc:'Exploring visual storytelling through photography, videography, and digital media creation.'},
-  {id:7,name:'Medical Students Society',category:'Health',icon:'⚕️',color:'rgba(248,113,113,0.15)',members:194,events:7,img:'https://images.unsplash.com/photo-1576671081837-49000212a370?w=600&q=80',desc:'Supporting medical students with study groups, clinical skill workshops, and community health drives.'},
-  {id:8,name:'Chess & Strategy Club',category:'Sports',icon:'♟️',color:'rgba(139,92,246,0.15)',members:45,events:3,img:'https://images.unsplash.com/photo-1580541832626-2a7131ee809f?w=600&q=80',desc:'Sharpening minds through chess tournaments, strategy games, and analytical thinking sessions.'},
+  {
+    id:1,
+    name:'Computer Science Club',
+    category:'Technology',
+    icon:'💻',
+    color:'rgba(139,92,246,0.2)',
+    members:142,
+    events:8,
+    img:'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&q=80',
+    desc:'Fostering innovation and technical skills through workshops, hackathons, and coding challenges.'
+  },
+  {
+    id:2,
+    name:'Engineering Innovation Club',
+    category:'Engineering',
+    icon:'⚙️',
+    color:'rgba(201,168,76,0.2)',
+    members:98,
+    events:5,
+    img:'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80',
+    desc:'Bridging theoretical knowledge with real-world applications through hands-on engineering projects.'
+  },
+  {
+    id:3,
+    name:'Cultural Heritage Society',
+    category:'Culture',
+    icon:'🏺',
+    color:'rgba(244,114,182,0.2)',
+    members:215,
+    events:12,
+    img:'https://images.unsplash.com/photo-1541535650810-10d26f5c2ab3?w=600&q=80',
+    desc:'Celebrating and preserving Palestinian and Arab cultural heritage through arts, exhibitions, and events.'
+  },
+  {
+    id:4,
+    name:'Business & Entrepreneurship Club',
+    category:'Business',
+    icon:'📈',
+    color:'rgba(52,211,153,0.2)',
+    members:176,
+    events:9,
+    img:'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600&q=80',
+    desc:'Empowering student entrepreneurs with mentorship, pitch competitions, and startup resources.'
+  },
+  {
+    id:5,
+    name:'Environmental Action Group',
+    category:'Environment',
+    icon:'🌿',
+    color:'rgba(52,211,153,0.15)',
+    members:87,
+    events:6,
+    img:'https://images.unsplash.com/photo-1569163139500-9b7e13aebbdb?w=600&q=80',
+    desc:'Driving sustainability initiatives and environmental awareness on campus and beyond.'
+  },
+  {
+    id:6,
+    name:'Photography & Media Club',
+    category:'Arts',
+    icon:'📷',
+    color:'rgba(251,191,36,0.15)',
+    members:63,
+    events:4,
+    img:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80',
+    desc:'Exploring visual storytelling through photography, videography, and digital media creation.'
+  },
+  {
+    id:7,
+    name:'Medical Students Society',
+    category:'Health',
+    icon:'⚕️',
+    color:'rgba(248,113,113,0.15)',
+    members:194,
+    events:7,
+    img:'https://images.unsplash.com/photo-1576671081837-49000212a370?w=600&q=80',
+    desc:'Supporting medical students with study groups, clinical skill workshops, and community health drives.'
+  },
+  {
+    id:8,
+    name:'Chess & Strategy Club',
+    category:'Sports',
+    icon:'♟️',
+    color:'rgba(139,92,246,0.15)',
+    members:45,
+    events:3,
+    img:'https://images.unsplash.com/photo-1580541832626-2a7131ee809f?w=600&q=80',
+    desc:'Sharpening minds through chess tournaments, strategy games, and analytical thinking sessions.'
+  }
 ];
 
-const CATS = ['All', ...new Set(CLUBS.map(c=>c.category))];
+const CATS = ['All', ...new Set(CLUBS.map(c => c.category))];
 let activeCat = 'All';
 
-// Build category bar
-document.getElementById('catBar').innerHTML = CATS.map(c=>`<button class="cat-pill${c==='All'?' active':''}" data-c="${c}">${c}</button>`).join('');
-document.querySelectorAll('#catBar .cat-pill').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('#catBar .cat-pill').forEach(b=>b.classList.remove('active'));
+document.getElementById('catBar').innerHTML = CATS.map(c => `
+  <button class="cat-pill${c === 'All' ? ' active' : ''}" data-c="${c}">
+    ${c}
+  </button>
+`).join('');
+
+document.querySelectorAll('#catBar .cat-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#catBar .cat-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     activeCat = btn.dataset.c;
     renderClubs();
@@ -111,35 +444,62 @@ document.getElementById('clubSearch').addEventListener('input', renderClubs);
 
 function renderClubs() {
   const q = document.getElementById('clubSearch').value.trim().toLowerCase();
-  const filtered = CLUBS.filter(c=>{
+
+  const filtered = CLUBS.filter(c => {
     if (activeCat !== 'All' && c.category !== activeCat) return false;
-    if (q && !(c.name+c.category+c.desc).toLowerCase().includes(q)) return false;
+    if (q && !(c.name + c.category + c.desc).toLowerCase().includes(q)) return false;
     return true;
   });
-  document.getElementById('clubCount').textContent = filtered.length + ' club' + (filtered.length!==1?'s':'') + ' found';
+
+  document.getElementById('clubCount').textContent =
+    filtered.length + ' club' + (filtered.length !== 1 ? 's' : '') + ' found';
+
   document.getElementById('clubsEmpty').style.display = filtered.length ? 'none' : 'block';
-  document.getElementById('clubsGrid').innerHTML = filtered.map(c=>`
+
+  document.getElementById('clubsGrid').innerHTML = filtered.map(c => `
     <div class="col-sm-6 col-lg-4">
       <div class="club-card">
         <div class="club-banner" style="background-image:url('${c.img}')">
           <div class="club-avatar" style="background:${c.color};">${c.icon}</div>
         </div>
+
         <div class="club-body">
           <div class="club-name">${c.name}</div>
-          <div class="club-category"><span class="badge-gold" style="font-size:0.65rem;">${c.category}</span></div>
-          <div class="club-desc">${c.desc}</div>
-          <div class="club-stats">
-            <span><i class="bi bi-people me-1" style="color:var(--gold);"></i>${c.members} members</span>
-            <span><i class="bi bi-calendar3 me-1" style="color:var(--gold);"></i>${c.events} events</span>
+
+          <div class="club-category">
+            <span class="badge-gold" style="font-size:0.65rem;">${c.category}</span>
           </div>
-          <div class="d-flex gap-2 mt-3">
-            <button class="btn-ghost flex-grow-1 justify-content-center" style="font-size:0.8rem;" onclick="viewClub(${c.id})"><i class="bi bi-eye me-1"></i>View</button>
-            <button class="btn-gold flex-grow-1 justify-content-center" style="font-size:0.8rem;" onclick="joinClub(${c.id})"><i class="bi bi-person-plus me-1"></i>Join</button>
+
+          <div class="club-desc">${c.desc}</div>
+
+          <div class="club-stats">
+            <span>
+              <i class="bi bi-people" style="color:var(--gold);"></i>
+              ${c.members} members
+            </span>
+            <span>
+              <i class="bi bi-calendar3" style="color:var(--gold);"></i>
+              ${c.events} events
+            </span>
+          </div>
+
+          <div class="club-actions">
+            <button class="club-btn club-btn-view" onclick="viewClub(${c.id})">
+              <i class="bi bi-eye"></i>
+              <span>View</span>
+            </button>
+
+            <button class="club-btn club-btn-join" onclick="joinClub(${c.id})">
+              <i class="bi bi-person-plus"></i>
+              <span>Join</span>
+            </button>
           </div>
         </div>
       </div>
-    </div>`).join('');
+    </div>
+  `).join('');
 }
+
 renderClubs();
 
 const joinModal = new bootstrap.Modal(document.getElementById('joinModal'));
@@ -147,26 +507,43 @@ let selectedClub = null;
 
 function joinClub(id) {
   const user = getCurrentUser();
-  if (!user) { showToast('Please login to join clubs','info'); setTimeout(()=>window.location.href='login.html',1000); return; }
-  selectedClub = CLUBS.find(c=>c.id===id);
+
+  if (!user) {
+    showToast('Please login to join clubs', 'info');
+    setTimeout(() => window.location.href = 'login.html', 1000);
+    return;
+  }
+
+  selectedClub = CLUBS.find(c => c.id === id);
+
   document.getElementById('joinTitle').textContent = 'Join ' + selectedClub.name;
   document.getElementById('joinDesc').textContent = selectedClub.desc;
-  if (user) { document.getElementById('joinName').value=user.name||''; }
+
+  if (user) {
+    document.getElementById('joinName').value = user.name || '';
+  }
+
   joinModal.show();
 }
 
 function viewClub(id) {
-  const c = CLUBS.find(x=>x.id===id);
+  const c = CLUBS.find(x => x.id === id);
   showToast('Viewing: ' + c.name, 'info');
 }
 
-document.getElementById('joinConfirm').addEventListener('click',()=>{
+document.getElementById('joinConfirm').addEventListener('click', () => {
   const name = document.getElementById('joinName').value.trim();
   const sid = document.getElementById('joinId').value.trim();
-  if (!name || !sid) { showToast('Please fill all fields','error'); return; }
+
+  if (!name || !sid) {
+    showToast('Please fill all fields', 'error');
+    return;
+  }
+
   joinModal.hide();
   showToast('Request sent to ' + selectedClub.name + '! You\'ll be notified soon.', 'success');
 });
 </script>
+
 </body>
 </html>

@@ -2,19 +2,25 @@
 <html lang="en" data-theme="dark">
 <head>
 <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("najah_theme")||"dark");</script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Najah Events — University Event Platform</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="global.css">
-  <link rel="stylesheet" href="index.css">
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Najah Events — University Event Platform</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="global.css">
+<link rel="stylesheet" href="index.css">
 </head>
 <body>
 
+<!-- Preloader -->
+<div id="preloader">
+  <div class="preloader-logo">◆ Najah Events</div>
+  <div class="preloader-bar"><div class="preloader-fill"></div></div>
+</div>
+
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
   <div class="container">
-    <a class="navbar-brand gradient-text" href="index.html"><span style="font-size:1.1rem;">◆</span> Najah Events</a>
+    <a class="navbar-brand gradient-text" href="index.html"><span style="font-size:1.1rem">◆</span> Najah Events</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav mx-auto align-items-lg-center gap-lg-1">
@@ -30,40 +36,49 @@
 
 <!-- Hero -->
 <section class="hero-section" id="home">
+  <canvas id="heroCanvas"></canvas>
   <div class="hero-gradient"></div>
   <div class="hero-grid-bg"></div>
-  <div class="container position-relative" style="z-index:2;">
-    <div class="row align-items-center" style="min-height:100vh;padding-top:var(--nav-height);">
-      <div class="col-lg-7 py-5">
-        <div class="hero-badge animate-fade-up delay-1"><span class="dot"></span>An-Najah National University</div>
-        <h1 class="display-heading mt-3 animate-fade-up delay-2">
-          Where Campus<br><em class="gradient-text">Events Come</em><br>to Life
-        </h1>
-        <p class="hero-sub animate-fade-up delay-3">
-          Discover, organize, and manage university events — from career expos to tech conferences. One platform, endless possibilities.
-        </p>
-        <div class="hero-actions animate-fade-up delay-4">
-          <a href="events.html" class="btn-gold btn-lg-custom"><i class="bi bi-compass"></i> Explore Events</a>
-          <a href="reserve.html" class="btn-outline-gold btn-lg-custom"><i class="bi bi-calendar2-plus"></i> Book a Venue</a>
+  <div class="container position-relative" style="z-index:2">
+    <div class="row align-items-center" style="min-height:100vh;padding-top:var(--nav-height)">
+      <div class="col-lg-6 py-5 hero-content-col">
+        <div class="hero-badge animate-fade-up delay-1">
+          <span class="dot"></span>An-Najah National University
         </div>
-        <div class="hero-tags animate-fade-up delay-5">
+        <h1 class="display-heading mt-4 animate-fade-up delay-2" data-word-reveal>
+          Where Campus Events Come to Life
+        </h1>
+        <div class="animate-fade-up delay-3">
+          <span class="hero-scramble" data-scramble="Discover · Organize · Celebrate|Career Expos · Tech Summits · Festivals|One Platform · Endless Possibilities">Discover · Organize · Celebrate</span>
+        </div>
+        <p class="hero-sub animate-fade-up delay-4">
+          The official event management platform of An-Najah National University — reserve venues, register for events, and connect with campus life.
+        </p>
+        <div class="hero-actions animate-fade-up delay-5">
+          <a href="events.html" class="btn-gold btn-lg-custom" data-magnetic><i class="bi bi-compass"></i> Explore Events</a>
+          <a href="reserve.html" class="btn-outline-gold btn-lg-custom" data-magnetic><i class="bi bi-calendar2-plus"></i> Book a Venue</a>
+        </div>
+        <div class="hero-tags animate-fade-up delay-6">
           <span class="tag"><i class="bi bi-mortarboard-fill me-1"></i>Students</span>
           <span class="tag"><i class="bi bi-building me-1"></i>Companies</span>
           <span class="tag"><i class="bi bi-people-fill me-1"></i>Clubs</span>
           <span class="tag"><i class="bi bi-shield-check me-1"></i>Verified</span>
         </div>
       </div>
-      <div class="col-lg-5 d-none d-lg-block animate-fade-up delay-3">
+      <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center hero-visual-col animate-fade-up delay-3">
         <div class="hero-card-stack">
-          <div class="hero-float-card card-1">
+          <div class="hero-live-badge"><span class="live-dot"></span>Live Now — Spring Festival</div>
+          <div class="hero-float-card card-1" data-tilt="8">
             <div class="hfc-img" style="background-image:url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80')"></div>
             <div class="hfc-content">
               <span class="hfc-badge">Expo</span>
               <div class="hfc-title">Career Expo 2026</div>
               <div class="hfc-meta"><i class="bi bi-geo-alt"></i> Main Auditorium · Apr 12</div>
+              <div class="hfc-bar"><div class="hfc-progress" style="width:78%"></div></div>
+              <div class="hfc-fill">78% seats filled</div>
             </div>
           </div>
-          <div class="hero-float-card card-2">
+          <div class="hero-float-card card-2" data-tilt="8">
             <div class="hfc-img" style="background-image:url('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=400&q=80')"></div>
             <div class="hfc-content">
               <span class="hfc-badge badge-conf">Conference</span>
@@ -73,7 +88,7 @@
           </div>
           <div class="hero-stat-card">
             <div class="hsc-inner">
-              <i class="bi bi-check-circle-fill" style="color:#34d399;font-size:1.2rem;"></i>
+              <i class="bi bi-check-circle-fill" style="color:#34d399;font-size:1.2rem"></i>
               <div><div class="hsc-num">98%</div><div class="hsc-label">Booking success rate</div></div>
             </div>
           </div>
@@ -84,83 +99,166 @@
   <div class="hero-scroll-hint"><span>Scroll to explore</span><div class="scroll-line"></div></div>
 </section>
 
+<!-- Marquee Strip -->
+<div class="marquee-strip">
+  <div class="marquee-wrapper">
+    <div class="marquee-track">
+      <span class="marquee-item"><i class="bi bi-circle-fill"></i>Career Expo 2026</span>
+      <span class="marquee-item"><i class="bi bi-circle-fill"></i>TechTalk Summit</span>
+      <span class="marquee-item"><i class="bi bi-circle-fill"></i>Spring Cultural Festival</span>
+      <span class="marquee-item"><i class="bi bi-circle-fill"></i>Projects Innovation Fair</span>
+      <span class="marquee-item"><i class="bi bi-circle-fill"></i>Engineering Hackathon</span>
+      <span class="marquee-item"><i class="bi bi-circle-fill"></i>Leadership Workshop</span>
+      <span class="marquee-item"><i class="bi bi-circle-fill"></i>Medical Research Symposium</span>
+      <span class="marquee-item"><i class="bi bi-circle-fill"></i>Startup Pitch Night</span>
+      <span class="marquee-item"><i class="bi bi-circle-fill"></i>Sports Championship</span>
+      <span class="marquee-item"><i class="bi bi-circle-fill"></i>Art & Design Exhibition</span>
+    </div>
+  </div>
+</div>
+
 <!-- Stats Bar -->
 <section class="stats-bar">
   <div class="container">
     <div class="stats-inner">
-      <div class="stat-item"><div class="stat-num" data-counter data-target="147" data-suffix="+">0</div><div class="stat-label">Events Hosted</div></div>
+      <div class="stat-item" data-reveal="0">
+        <div class="stat-num" data-counter data-target="147" data-suffix="+">0</div>
+        <div class="stat-label">Events Hosted</div>
+      </div>
       <div class="stat-divider"></div>
-      <div class="stat-item"><div class="stat-num" data-counter data-target="38">0</div><div class="stat-label">Venues Available</div></div>
+      <div class="stat-item" data-reveal="80">
+        <div class="stat-num" data-counter data-target="38">0</div>
+        <div class="stat-label">Campus Venues</div>
+      </div>
       <div class="stat-divider"></div>
-      <div class="stat-item"><div class="stat-num" data-counter data-target="5200" data-suffix="+">0</div><div class="stat-label">Participants</div></div>
+      <div class="stat-item" data-reveal="160">
+        <div class="stat-num" data-counter data-target="5200" data-suffix="+">0</div>
+        <div class="stat-label">Participants</div>
+      </div>
       <div class="stat-divider"></div>
-      <div class="stat-item"><div class="stat-num" data-counter data-target="24">0</div><div class="stat-label">Active Clubs</div></div>
+      <div class="stat-item" data-reveal="240">
+        <div class="stat-num" data-counter data-target="24">0</div>
+        <div class="stat-label">Active Clubs</div>
+      </div>
       <div class="stat-divider"></div>
-      <div class="stat-item"><div class="stat-num" data-counter data-target="98" data-suffix="%">0</div><div class="stat-label">Satisfaction</div></div>
+      <div class="stat-item" data-reveal="320">
+        <div class="stat-num" data-counter data-target="98" data-suffix="%">0</div>
+        <div class="stat-label">Satisfaction</div>
+      </div>
     </div>
   </div>
 </section>
 
+<hr class="gold-divider">
+
 <!-- Featured Events -->
 <section class="section-py" id="events">
   <div class="container">
-    <div class="section-header" data-reveal="0">
-      <div class="section-label"><i class="bi bi-calendar-event me-1"></i> Featured Events</div>
-      <h2 class="section-title mt-2">Upcoming on Campus</h2>
-    </div>
-    <div class="events-grid mt-5">
-      <div class="event-featured" data-reveal="0">
-        <div class="ef-img" style="background-image:url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=900&q=80')">
-          <div class="ef-overlay"></div>
-          <div class="ef-content">
-            <div class="d-flex gap-2 mb-3"><span class="badge-category">Expo</span><span class="badge-available"><i class="bi bi-circle-fill" style="font-size:0.5rem"></i> Open</span></div>
-            <h3 class="ef-title">Career &amp; Internship Expo 2026</h3>
-            <p class="ef-desc">Connect with top companies, explore internships, and build your professional network at the largest annual career event.</p>
-            <div class="ef-meta"><span><i class="bi bi-geo-alt"></i> Main Auditorium</span><span><i class="bi bi-calendar3"></i> April 12, 2026</span><span><i class="bi bi-people"></i> 500+</span></div>
-            <div class="mt-4"><a href="events.html" class="btn-gold">Register Now <i class="bi bi-arrow-right ms-1"></i></a></div>
-          </div>
-        </div>
+    <div class="section-header-flex" data-reveal="0">
+      <div>
+        <div class="section-label"><i class="bi bi-calendar-event me-1"></i>Featured Events</div>
+        <h2 class="section-title mt-2">Upcoming on Campus</h2>
       </div>
-      <div class="events-side">
-        <div class="card-premium event-side-card" data-reveal="100">
-          <div class="img-hover-zoom"><img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=500&q=80" alt="Tech"></div>
-          <div class="p-3">
-            <span class="badge-category mb-2 d-inline-block">Conference</span>
-            <h6 style="font-family:var(--font-display);" class="mb-1">TechTalk Summit 2026</h6>
-            <p class="small mb-2" style="color:var(--text-muted)">Engineering Hall · April 5</p>
-            <div class="d-flex align-items-center justify-content-between">
-              <span class="small" style="color:var(--text-secondary)"><i class="bi bi-people me-1"></i>340 registered</span>
-              <a href="events.html" class="btn-ghost" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Join</a>
+      <a href="events.html" class="btn-outline-gold">All Events <i class="bi bi-arrow-right ms-1"></i></a>
+    </div>
+    <div class="events-hscroll" data-reveal="100">
+      <div class="events-h-track">
+
+        <div class="event-h-card" data-tilt="5">
+          <div class="ehc-img" style="background-image:url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80')">
+            <div class="ehc-img-overlay"></div>
+            <div class="ehc-badges"><span class="badge-category">Expo</span><span class="badge-available"><i class="bi bi-circle-fill" style="font-size:.5rem"></i>Open</span></div>
+          </div>
+          <div class="ehc-body">
+            <div class="ehc-title">Career &amp; Internship Expo 2026</div>
+            <div class="ehc-meta">
+              <span><i class="bi bi-geo-alt"></i>Main Auditorium</span>
+              <span><i class="bi bi-calendar3"></i>April 12, 2026</span>
+            </div>
+            <div class="ehc-footer">
+              <span class="ehc-count"><i class="bi bi-people me-1"></i>500+ seats</span>
+              <a href="events.html" class="btn-gold" style="padding:.4rem 1.1rem;font-size:.8rem">Register</a>
             </div>
           </div>
         </div>
-        <div class="card-premium event-side-card" data-reveal="200">
-          <div class="img-hover-zoom"><img src="https://images.unsplash.com/photo-1558008258-3256797b43f3?w=500&q=80" alt="Projects"></div>
-          <div class="p-3">
-            <span class="badge-category mb-2 d-inline-block" style="background:rgba(251,191,36,0.15);color:#fbbf24;border-color:rgba(251,191,36,0.3);">Workshop</span>
-            <h6 style="font-family:var(--font-display);" class="mb-1">Projects Innovation Fair</h6>
-            <p class="small mb-2" style="color:var(--text-muted)">Expo Hall · May 1</p>
-            <div class="d-flex align-items-center justify-content-between">
-              <span class="small" style="color:var(--text-secondary)"><i class="bi bi-mortarboard me-1"></i>Students only</span>
-              <a href="events.html" class="btn-ghost" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Join</a>
+
+        <div class="event-h-card" data-tilt="5">
+          <div class="ehc-img" style="background-image:url('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&q=80')">
+            <div class="ehc-img-overlay"></div>
+            <div class="ehc-badges"><span class="badge-category">Conference</span></div>
+          </div>
+          <div class="ehc-body">
+            <div class="ehc-title">TechTalk Summit 2026</div>
+            <div class="ehc-meta">
+              <span><i class="bi bi-geo-alt"></i>Engineering Hall</span>
+              <span><i class="bi bi-calendar3"></i>April 5, 2026</span>
+            </div>
+            <div class="ehc-footer">
+              <span class="ehc-count"><i class="bi bi-people me-1"></i>340 registered</span>
+              <a href="events.html" class="btn-gold" style="padding:.4rem 1.1rem;font-size:.8rem">Join</a>
             </div>
           </div>
         </div>
-        <div class="card-premium event-side-card" data-reveal="300">
-          <div class="img-hover-zoom"><img src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=500&q=80" alt="Festival"></div>
-          <div class="p-3">
-            <span class="badge-category mb-2 d-inline-block" style="background:rgba(244,114,182,0.15);color:#f472b6;border-color:rgba(244,114,182,0.3);">Festival</span>
-            <h6 style="font-family:var(--font-display);" class="mb-1">Spring Cultural Festival</h6>
-            <p class="small mb-2" style="color:var(--text-muted)">Outdoor Stage · May 15</p>
-            <div class="d-flex align-items-center justify-content-between">
-              <span class="small" style="color:var(--text-secondary)"><i class="bi bi-people me-1"></i>Open to all</span>
-              <a href="events.html" class="btn-ghost" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Join</a>
+
+        <div class="event-h-card" data-tilt="5">
+          <div class="ehc-img" style="background-image:url('https://images.unsplash.com/photo-1558008258-3256797b43f3?w=600&q=80')">
+            <div class="ehc-img-overlay"></div>
+            <div class="ehc-badges"><span class="badge-category" style="background:rgba(251,191,36,.1);color:#fbbf24;border-color:rgba(251,191,36,.25)">Workshop</span></div>
+          </div>
+          <div class="ehc-body">
+            <div class="ehc-title">Projects Innovation Fair</div>
+            <div class="ehc-meta">
+              <span><i class="bi bi-geo-alt"></i>Expo Hall</span>
+              <span><i class="bi bi-calendar3"></i>May 1, 2026</span>
+            </div>
+            <div class="ehc-footer">
+              <span class="ehc-count"><i class="bi bi-mortarboard me-1"></i>Students only</span>
+              <a href="events.html" class="btn-gold" style="padding:.4rem 1.1rem;font-size:.8rem">Join</a>
             </div>
           </div>
         </div>
+
+        <div class="event-h-card" data-tilt="5">
+          <div class="ehc-img" style="background-image:url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&q=80')">
+            <div class="ehc-img-overlay"></div>
+            <div class="ehc-badges"><span class="badge-category" style="background:rgba(244,114,182,.1);color:#f472b6;border-color:rgba(244,114,182,.25)">Festival</span></div>
+          </div>
+          <div class="ehc-body">
+            <div class="ehc-title">Spring Cultural Festival</div>
+            <div class="ehc-meta">
+              <span><i class="bi bi-geo-alt"></i>Outdoor Stage</span>
+              <span><i class="bi bi-calendar3"></i>May 15, 2026</span>
+            </div>
+            <div class="ehc-footer">
+              <span class="ehc-count"><i class="bi bi-people me-1"></i>Open to all</span>
+              <a href="events.html" class="btn-gold" style="padding:.4rem 1.1rem;font-size:.8rem">Join</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-h-card" data-tilt="5">
+          <div class="ehc-img" style="background-image:url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&q=80')">
+            <div class="ehc-img-overlay"></div>
+            <div class="ehc-badges"><span class="badge-category" style="background:rgba(52,211,153,.1);color:#34d399;border-color:rgba(52,211,153,.25)">Hackathon</span></div>
+          </div>
+          <div class="ehc-body">
+            <div class="ehc-title">Engineering Hackathon 2026</div>
+            <div class="ehc-meta">
+              <span><i class="bi bi-geo-alt"></i>CS Building</span>
+              <span><i class="bi bi-calendar3"></i>June 3, 2026</span>
+            </div>
+            <div class="ehc-footer">
+              <span class="ehc-count"><i class="bi bi-people me-1"></i>Teams of 4</span>
+              <a href="events.html" class="btn-gold" style="padding:.4rem 1.1rem;font-size:.8rem">Register</a>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
-    <div class="text-center mt-5" data-reveal="0"><a href="events.html" class="btn-outline-gold">View All Events <i class="bi bi-arrow-right ms-1"></i></a></div>
+    <div class="text-center mt-3" data-reveal="0">
+      <span class="scroll-hint-text"><i class="bi bi-arrows-expand-vertical" style="transform:rotate(90deg)"></i>Swipe to explore more events</span>
+    </div>
   </div>
 </section>
 
@@ -169,12 +267,35 @@
 <!-- How It Works -->
 <section class="section-py">
   <div class="container">
-    <div class="section-header" data-reveal="0"><div class="section-label"><i class="bi bi-lightning me-1"></i> Process</div><h2 class="section-title mt-2">How It Works</h2></div>
-    <div class="row g-4 mt-4">
-      <div class="col-md-6 col-lg-3" data-reveal="0"><div class="how-card"><div class="how-num">01</div><div class="how-icon"><i class="bi bi-person-plus"></i></div><h5>Create Account</h5><p class="small">Register as a student, company, or club representative. Verified in minutes.</p></div></div>
-      <div class="col-md-6 col-lg-3" data-reveal="100"><div class="how-card"><div class="how-num">02</div><div class="how-icon"><i class="bi bi-search"></i></div><h5>Browse &amp; Discover</h5><p class="small">Explore events or find the perfect venue — filter by capacity, type, and availability.</p></div></div>
-      <div class="col-md-6 col-lg-3" data-reveal="200"><div class="how-card"><div class="how-num">03</div><div class="how-icon"><i class="bi bi-calendar2-check"></i></div><h5>Submit Request</h5><p class="small">Send your booking request with event details. Track status in real-time.</p></div></div>
-      <div class="col-md-6 col-lg-3" data-reveal="300"><div class="how-card"><div class="how-num">04</div><div class="how-icon"><i class="bi bi-check2-all"></i></div><h5>Get Confirmed</h5><p class="small">Receive instant notifications when your request is approved.</p></div></div>
+    <div class="section-header text-center mx-auto" data-reveal="0">
+      <div class="section-label"><i class="bi bi-lightning me-1"></i>Process</div>
+      <h2 class="section-title mt-2" data-word-reveal>How It Works</h2>
+    </div>
+    <div class="how-steps mt-5">
+      <div class="how-card" data-reveal="0">
+        <div class="how-num-wrap"><div class="how-num">01</div></div>
+        <div class="how-icon"><i class="bi bi-person-plus"></i></div>
+        <h5>Create Account</h5>
+        <p>Register as a student, company, or club representative. Verified in minutes.</p>
+      </div>
+      <div class="how-card" data-reveal="100">
+        <div class="how-num-wrap"><div class="how-num">02</div></div>
+        <div class="how-icon"><i class="bi bi-search"></i></div>
+        <h5>Browse &amp; Discover</h5>
+        <p>Explore events or find the perfect venue — filter by capacity, type, and availability.</p>
+      </div>
+      <div class="how-card" data-reveal="200">
+        <div class="how-num-wrap"><div class="how-num">03</div></div>
+        <div class="how-icon"><i class="bi bi-calendar2-check"></i></div>
+        <h5>Submit Request</h5>
+        <p>Send your booking with full event details. Track status in real-time.</p>
+      </div>
+      <div class="how-card" data-reveal="300">
+        <div class="how-num-wrap"><div class="how-num">04</div></div>
+        <div class="how-icon"><i class="bi bi-check2-all"></i></div>
+        <h5>Get Confirmed</h5>
+        <p>Receive instant notifications when your request is approved and ready.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -184,22 +305,65 @@
 <!-- Venues Preview -->
 <section class="section-py" id="venues">
   <div class="container">
-    <div class="d-flex align-items-end justify-content-between flex-wrap gap-3" data-reveal="0">
-      <div><div class="section-label"><i class="bi bi-building me-1"></i> Venues</div><h2 class="section-title mt-2">Campus Spaces</h2></div>
+    <div class="section-header-flex" data-reveal="0">
+      <div>
+        <div class="section-label"><i class="bi bi-building me-1"></i>Venues</div>
+        <h2 class="section-title mt-2">Campus Spaces</h2>
+      </div>
       <a href="venues.html" class="btn-outline-gold">Explore All <i class="bi bi-arrow-right ms-1"></i></a>
     </div>
     <div class="venues-grid mt-5">
-      <div class="venue-card-home card-premium" data-reveal="0">
-        <div class="vc-img" style="background-image:url('https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=600&q=80')"><div class="vc-overlay"></div><div class="vc-badge"><span class="badge-available"><i class="bi bi-circle-fill" style="font-size:0.4rem"></i> Available</span></div><div class="vc-cap"><i class="bi bi-people"></i> 800</div></div>
-        <div class="vc-content"><h5 class="vc-name">Main Auditorium</h5><p class="vc-type"><i class="bi bi-building me-1"></i>Main Campus · Auditorium</p><div class="vc-features"><span class="feature-chip"><i class="bi bi-check2"></i> Stage</span><span class="feature-chip"><i class="bi bi-check2"></i> Sound</span><span class="feature-chip"><i class="bi bi-check2"></i> AC</span></div><a href="reserve.html" class="btn-gold mt-3 w-100 justify-content-center">Book This Venue</a></div>
+      <div class="venue-card-home card-premium" data-reveal="0" data-tilt="6">
+        <div class="vc-img" style="background-image:url('https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=700&q=80')">
+          <div class="vc-overlay"></div>
+          <div class="vc-badge"><span class="badge-available"><i class="bi bi-circle-fill" style="font-size:.4rem"></i>Available</span></div>
+          <div class="vc-cap"><i class="bi bi-people me-1"></i>800</div>
+        </div>
+        <div class="vc-content">
+          <div class="vc-name">Main Auditorium</div>
+          <div class="vc-type"><i class="bi bi-building"></i>Main Campus · Auditorium</div>
+          <div class="vc-features">
+            <span class="feature-chip"><i class="bi bi-check2"></i>Stage</span>
+            <span class="feature-chip"><i class="bi bi-check2"></i>Sound</span>
+            <span class="feature-chip"><i class="bi bi-check2"></i>AC</span>
+            <span class="feature-chip"><i class="bi bi-check2"></i>Lighting</span>
+          </div>
+          <a href="reserve.html" class="btn-gold mt-3 w-100 justify-content-center" data-magnetic>Book This Venue</a>
+        </div>
       </div>
-      <div class="venue-card-home card-premium" data-reveal="100">
-        <div class="vc-img" style="background-image:url('https://images.unsplash.com/photo-1515169067868-5387ec356754?w=600&q=80')"><div class="vc-overlay"></div><div class="vc-badge"><span class="badge-available"><i class="bi bi-circle-fill" style="font-size:0.4rem"></i> Available</span></div><div class="vc-cap"><i class="bi bi-people"></i> 600</div></div>
-        <div class="vc-content"><h5 class="vc-name">Expo Hall</h5><p class="vc-type"><i class="bi bi-building me-1"></i>Student Center · Hall</p><div class="vc-features"><span class="feature-chip"><i class="bi bi-check2"></i> Booths</span><span class="feature-chip"><i class="bi bi-check2"></i> Wi-Fi</span><span class="feature-chip"><i class="bi bi-check2"></i> Power</span></div><a href="reserve.html" class="btn-gold mt-3 w-100 justify-content-center">Book This Venue</a></div>
+      <div class="venue-card-home card-premium" data-reveal="120" data-tilt="6">
+        <div class="vc-img" style="background-image:url('https://images.unsplash.com/photo-1515169067868-5387ec356754?w=700&q=80')">
+          <div class="vc-overlay"></div>
+          <div class="vc-badge"><span class="badge-available"><i class="bi bi-circle-fill" style="font-size:.4rem"></i>Available</span></div>
+          <div class="vc-cap"><i class="bi bi-people me-1"></i>600</div>
+        </div>
+        <div class="vc-content">
+          <div class="vc-name">Expo Hall</div>
+          <div class="vc-type"><i class="bi bi-building"></i>Student Center · Hall</div>
+          <div class="vc-features">
+            <span class="feature-chip"><i class="bi bi-check2"></i>Booths</span>
+            <span class="feature-chip"><i class="bi bi-check2"></i>Wi-Fi</span>
+            <span class="feature-chip"><i class="bi bi-check2"></i>Power</span>
+          </div>
+          <a href="reserve.html" class="btn-gold mt-3 w-100 justify-content-center" data-magnetic>Book This Venue</a>
+        </div>
       </div>
-      <div class="venue-card-home card-premium" data-reveal="200">
-        <div class="vc-img" style="background-image:url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&q=80')"><div class="vc-overlay"></div><div class="vc-badge"><span class="badge-available"><i class="bi bi-circle-fill" style="font-size:0.4rem"></i> Available</span></div><div class="vc-cap"><i class="bi bi-people"></i> 1200</div></div>
-        <div class="vc-content"><h5 class="vc-name">Outdoor Stage</h5><p class="vc-type"><i class="bi bi-geo-alt me-1"></i>Central Yard · Outdoor</p><div class="vc-features"><span class="feature-chip"><i class="bi bi-check2"></i> Stage</span><span class="feature-chip"><i class="bi bi-check2"></i> Lighting</span><span class="feature-chip"><i class="bi bi-check2"></i> Security</span></div><a href="reserve.html" class="btn-gold mt-3 w-100 justify-content-center">Book This Venue</a></div>
+      <div class="venue-card-home card-premium" data-reveal="240" data-tilt="6">
+        <div class="vc-img" style="background-image:url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=700&q=80')">
+          <div class="vc-overlay"></div>
+          <div class="vc-badge"><span class="badge-available"><i class="bi bi-circle-fill" style="font-size:.4rem"></i>Available</span></div>
+          <div class="vc-cap"><i class="bi bi-people me-1"></i>1,200</div>
+        </div>
+        <div class="vc-content">
+          <div class="vc-name">Outdoor Stage</div>
+          <div class="vc-type"><i class="bi bi-geo-alt"></i>Central Yard · Outdoor</div>
+          <div class="vc-features">
+            <span class="feature-chip"><i class="bi bi-check2"></i>Stage</span>
+            <span class="feature-chip"><i class="bi bi-check2"></i>Lighting</span>
+            <span class="feature-chip"><i class="bi bi-check2"></i>Security</span>
+          </div>
+          <a href="reserve.html" class="btn-gold mt-3 w-100 justify-content-center" data-magnetic>Book This Venue</a>
+        </div>
       </div>
     </div>
   </div>
@@ -210,11 +374,41 @@
 <!-- Who It's For -->
 <section class="section-py">
   <div class="container">
-    <div class="section-header text-center" data-reveal="0"><div class="section-label">Who It's For</div><h2 class="section-title mt-2">Built for Everyone on Campus</h2></div>
-    <div class="row g-4 mt-4">
-      <div class="col-md-4" data-reveal="0"><div class="audience-card"><div class="aud-icon"><i class="bi bi-mortarboard-fill"></i></div><h4>Students</h4><p>Browse events, register instantly, and stay updated on campus activities.</p><ul class="aud-list"><li><i class="bi bi-check2"></i> Register for events</li><li><i class="bi bi-check2"></i> Track booking status</li><li><i class="bi bi-check2"></i> Get notifications</li></ul></div></div>
-      <div class="col-md-4" data-reveal="150"><div class="audience-card audience-card--featured"><div class="aud-icon aud-icon--gold"><i class="bi bi-building-fill"></i></div><h4>Companies</h4><p>Reserve premium booths and halls to connect with the next generation of talent.</p><ul class="aud-list"><li><i class="bi bi-check2"></i> Book exhibition spaces</li><li><i class="bi bi-check2"></i> Manage booth layouts</li><li><i class="bi bi-check2"></i> Access student talent</li></ul></div></div>
-      <div class="col-md-4" data-reveal="300"><div class="audience-card"><div class="aud-icon"><i class="bi bi-people-fill"></i></div><h4>University Clubs</h4><p>Plan and manage club events with ease — from booking to attendance tracking.</p><ul class="aud-list"><li><i class="bi bi-check2"></i> Organize club events</li><li><i class="bi bi-check2"></i> Manage reservations</li><li><i class="bi bi-check2"></i> Promote activities</li></ul></div></div>
+    <div class="section-header text-center mx-auto" data-reveal="0">
+      <div class="section-label">Who It's For</div>
+      <h2 class="section-title mt-2" data-word-reveal>Built for Everyone on Campus</h2>
+    </div>
+    <div class="audience-grid mt-5">
+      <div class="audience-card" data-reveal="0" data-tilt="5">
+        <div class="aud-icon"><i class="bi bi-mortarboard-fill"></i></div>
+        <h4>Students</h4>
+        <p>Browse events, register instantly, and stay updated on every campus activity.</p>
+        <ul class="aud-list">
+          <li><i class="bi bi-check2"></i>Register for events</li>
+          <li><i class="bi bi-check2"></i>Track booking status</li>
+          <li><i class="bi bi-check2"></i>Get notifications</li>
+        </ul>
+      </div>
+      <div class="audience-card audience-card--featured" data-reveal="150" data-tilt="5">
+        <div class="aud-icon aud-icon--gold"><i class="bi bi-building-fill"></i></div>
+        <h4>Companies</h4>
+        <p>Reserve premium booths and halls to connect with the next generation of talent.</p>
+        <ul class="aud-list">
+          <li><i class="bi bi-check2"></i>Book exhibition spaces</li>
+          <li><i class="bi bi-check2"></i>Manage booth layouts</li>
+          <li><i class="bi bi-check2"></i>Access student talent</li>
+        </ul>
+      </div>
+      <div class="audience-card" data-reveal="300" data-tilt="5">
+        <div class="aud-icon"><i class="bi bi-people-fill"></i></div>
+        <h4>University Clubs</h4>
+        <p>Plan and manage club events with ease — from booking to attendance tracking.</p>
+        <ul class="aud-list">
+          <li><i class="bi bi-check2"></i>Organize club events</li>
+          <li><i class="bi bi-check2"></i>Manage reservations</li>
+          <li><i class="bi bi-check2"></i>Promote activities</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -224,11 +418,38 @@
 <!-- Testimonials -->
 <section class="section-py" id="testimonials">
   <div class="container">
-    <div class="section-header" data-reveal="0"><div class="section-label"><i class="bi bi-chat-quote me-1"></i> Reviews</div><h2 class="section-title mt-2">What People Say</h2></div>
-    <div class="row g-4 mt-4">
-      <div class="col-md-6 col-lg-4" data-reveal="0"><div class="testimonial-card"><div class="tc-stars">★★★★★</div><p class="tc-text">"The booking process is seamless. I reserved the Engineering Hall for our hackathon in under 5 minutes — something that used to take weeks of emails."</p><div class="tc-author"><div class="tc-avatar">A</div><div><div class="tc-name">Ahmad Khalil</div><div class="tc-role">CS Club President</div></div></div></div></div>
-      <div class="col-md-6 col-lg-4" data-reveal="150"><div class="testimonial-card"><div class="tc-stars">★★★★★</div><p class="tc-text">"As a recruiting company, having a dedicated portal to book our expo booth and reach 500+ students is incredibly valuable. Top-tier platform."</p><div class="tc-author"><div class="tc-avatar tc-avatar--gold">T</div><div><div class="tc-name">Tala Mansour</div><div class="tc-role">HR Manager, TechCorp</div></div></div></div></div>
-      <div class="col-md-6 col-lg-4" data-reveal="300"><div class="testimonial-card"><div class="tc-stars">★★★★★</div><p class="tc-text">"Finally, a proper digital system for our university. The real-time approval tracking is a game-changer for our event committee."</p><div class="tc-author"><div class="tc-avatar tc-avatar--green">S</div><div><div class="tc-name">Sana Haddad</div><div class="tc-role">Events Coordinator</div></div></div></div></div>
+    <div class="section-header" data-reveal="0">
+      <div class="section-label"><i class="bi bi-chat-quote me-1"></i>Reviews</div>
+      <h2 class="section-title mt-2">What People Say</h2>
+    </div>
+    <div class="testimonials-grid mt-5">
+      <div class="testimonial-card" data-reveal="0" data-tilt="4">
+        <div class="tc-quote">"</div>
+        <p class="tc-text">The booking process is seamless. I reserved the Engineering Hall for our hackathon in under 5 minutes — something that used to take weeks of back-and-forth emails.</p>
+        <div class="tc-stars">★★★★★</div>
+        <div class="tc-author">
+          <div class="tc-avatar">A</div>
+          <div><div class="tc-name">Ahmad Khalil</div><div class="tc-role">CS Club President</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card" data-reveal="150" data-tilt="4">
+        <div class="tc-quote">"</div>
+        <p class="tc-text">As a recruiting company, having a dedicated portal to book our expo booth and reach 500+ students is incredibly valuable. Top-tier platform — highly recommend.</p>
+        <div class="tc-stars">★★★★★</div>
+        <div class="tc-author">
+          <div class="tc-avatar tc-avatar--gold">T</div>
+          <div><div class="tc-name">Tala Mansour</div><div class="tc-role">HR Manager, TechCorp</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card" data-reveal="300" data-tilt="4">
+        <div class="tc-quote">"</div>
+        <p class="tc-text">Finally, a proper digital system for our university. The real-time approval tracking is a game-changer for our entire events committee workflow.</p>
+        <div class="tc-stars">★★★★★</div>
+        <div class="tc-author">
+          <div class="tc-avatar tc-avatar--green">S</div>
+          <div><div class="tc-name">Sana Haddad</div><div class="tc-role">Events Coordinator</div></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -236,13 +457,13 @@
 <!-- CTA -->
 <section class="cta-section" data-reveal="0">
   <div class="cta-bg"></div>
-  <div class="container position-relative text-center">
+  <div class="container position-relative">
     <div class="section-label mb-3">Get Started Today</div>
-    <h2 class="section-title mb-4">Ready to Host Your Next<br>University Event?</h2>
-    <p style="color:var(--text-secondary);max-width:480px;margin:0 auto 2rem;">Join hundreds of students, clubs, and companies already using Najah Events.</p>
+    <h2 class="section-title mb-4" data-word-reveal>Ready to Host Your Next University Event?</h2>
+    <p style="color:var(--text-secondary);max-width:480px;margin:0 auto 2.5rem">Join hundreds of students, clubs, and companies already using Najah Events.</p>
     <div class="d-flex gap-3 justify-content-center flex-wrap">
-      <a href="register.html" class="btn-gold btn-lg-custom"><i class="bi bi-person-plus"></i> Create Free Account</a>
-      <a href="events.html" class="btn-outline-gold btn-lg-custom"><i class="bi bi-compass"></i> Explore Events</a>
+      <a href="register.html" class="btn-gold btn-lg-custom" data-magnetic><i class="bi bi-person-plus"></i> Create Free Account</a>
+      <a href="events.html" class="btn-outline-gold btn-lg-custom" data-magnetic><i class="bi bi-compass"></i> Explore Events</a>
     </div>
   </div>
 </section>
@@ -266,7 +487,10 @@
       <div class="col-6 col-lg-2"><div class="footer-heading">University</div><a href="about.html" class="footer-link">About</a><a href="#" class="footer-link">Contact</a><a href="#" class="footer-link">An-Najah NU</a></div>
       <div class="col-6 col-lg-2"><div class="footer-heading">Support</div><a href="#" class="footer-link">FAQ</a><a href="#" class="footer-link">Privacy Policy</a><a href="#" class="footer-link">Terms</a></div>
     </div>
-    <div class="footer-bottom"><span>© 2026 An-Najah National University — Najah Events</span><span>Built with ◆ for campus life</span></div>
+    <div class="footer-bottom">
+      <span>© 2026 An-Najah National University — Najah Events</span>
+      <span>Crafted with ◆ for campus life</span>
+    </div>
   </div>
 </footer>
 
