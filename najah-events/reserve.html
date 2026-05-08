@@ -169,57 +169,138 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="global.js"></script>
 <script>
-const VENUES_DATA = [
-  {id:1,name:'Main Auditorium',cap:800,status:'available',img:'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=400&q=80'},
-  {id:2,name:'Engineering Hall',cap:350,status:'busy',img:'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400&q=80'},
-  {id:3,name:'Expo Hall',cap:600,status:'available',img:'https://images.unsplash.com/photo-1515169067868-5387ec356754?w=400&q=80'},
-  {id:4,name:'Outdoor Stage',cap:1200,status:'available',img:'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=400&q=80'},
-  {id:5,name:'Workshop Room A',cap:60,status:'maintenance',img:'https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=400&q=80'},
-  {id:6,name:'Computer Lab 2',cap:40,status:'available',img:'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=400&q=80'},
-];
-
+let VENUES_DATA = [];
 let selectedVenueId = null;
 
-// Render venue options
 const grid = document.getElementById('venueSelectGrid');
 const params = new URLSearchParams(location.search);
 const preselect = parseInt(params.get('venue'), 10);
 
-VENUES_DATA.forEach(v => {
-  const avail = v.status === 'available';
-  const div = document.createElement('label');
-  div.className = 'venue-option' + (!avail ? ' opacity-50' : '');
-  div.innerHTML = `
-    <input type="radio" name="venueChoice" value="${v.id}" ${!avail ? 'disabled' : ''}>
-    <div class="d-flex align-items-center gap-2 mb-1">
-      <div class="vo-name">${v.name}</div>
-      ${!avail ? `<span class="badge-busy" style="font-size:0.65rem;">${v.status}</span>` : ''}
-    </div>
-    <div class="vo-meta"><i class="bi bi-people me-1"></i>Up to ${v.cap} · ${avail ? '✓ Available' : '✗ Unavailable'}</div>`;
-  div.addEventListener('click', () => {
-    if (!avail) return;
-    document.querySelectorAll('.venue-option').forEach(o => o.classList.remove('selected'));
-    div.classList.add('selected');
-    selectedVenueId = v.id;
-    updateSummary();
-    document.getElementById('summaryVenueImg').style.backgroundImage = `url(${v.img})`;
-    document.getElementById('summaryVenueImg').style.backgroundSize = 'cover';
-    document.getElementById('summaryVenueImg').style.backgroundPosition = 'center';
-    document.getElementById('sumVenue').textContent = v.name;
-  });
-  grid.appendChild(div);
-  if (v.id === preselect && avail) div.click();
-});
+function normalizeVenue(venue) {
+  return {
+    id: Number(venue.id),
+    name: venue.name || 'Untitled Venue',
+    cap: Number(venue.capacity || 0),
+    status: venue.status || 'available',
+    img: venue.image || 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=400&q=80',
+    building: venue.building || 'Najah University'
+  };
+}
 
-// Live summary update
+function roleToBackendValue(roleText) {
+  const value = String(roleText || '').toLowerCase();
+  if (value.includes('club')) return 'club_leader';
+  if (value.includes('faculty')) return 'faculty_member';
+  if (value.includes('company')) return 'company_representative';
+  if (value.includes('admin')) return 'admin_staff';
+  return 'student';
+}
+
+function fillOrganizerFromUser() {
+  const user = getCurrentUser();
+  if (!user) return;
+
+  const nameInput = document.getElementById('orgName');
+  const emailInput = document.getElementById('orgEmail');
+  const phoneInput = document.getElementById('orgPhone');
+  const orgInput = document.getElementById('orgFaculty');
+  const roleSelect = document.getElementById('orgRole');
+
+  if (nameInput && !nameInput.value) nameInput.value = user.full_name || user.name || '';
+  if (emailInput && !emailInput.value) emailInput.value = user.email || '';
+  if (phoneInput && !phoneInput.value) phoneInput.value = user.phone || '';
+  if (orgInput && !orgInput.value) orgInput.value = user.organization_name || '';
+
+  if (roleSelect && user.role) {
+    const targetByRole = {
+      student: 'Student',
+      company: 'Company Representative',
+      club: 'Club Leader',
+      admin: 'Admin Staff'
+    };
+    const target = targetByRole[user.role];
+    if (target) {
+      [...roleSelect.options].forEach((option, index) => {
+        if (option.textContent.trim() === target) roleSelect.selectedIndex = index;
+      });
+    }
+  }
+}
+
+function renderVenueOptions() {
+  grid.innerHTML = '';
+
+  if (!VENUES_DATA.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;color:var(--text-muted);font-size:.9rem;">No venues found. Check database connection.</div>`;
+    return;
+  }
+
+  VENUES_DATA.forEach(v => {
+    const avail = v.status === 'available';
+    const div = document.createElement('label');
+    div.className = 'venue-option' + (!avail ? ' opacity-50' : '');
+    div.innerHTML = `
+      <input type="radio" name="venueChoice" value="${v.id}" ${!avail ? 'disabled' : ''}>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <div class="vo-name">${v.name}</div>
+        ${!avail ? `<span class="badge-busy" style="font-size:0.65rem;">${v.status}</span>` : ''}
+      </div>
+      <div class="vo-meta"><i class="bi bi-geo-alt me-1"></i>${v.building}</div>
+      <div class="vo-meta"><i class="bi bi-people me-1"></i>Up to ${v.cap} · ${avail ? '✓ Available' : '✗ Unavailable'}</div>`;
+
+    div.addEventListener('click', () => {
+      if (!avail) return;
+      document.querySelectorAll('.venue-option').forEach(o => o.classList.remove('selected'));
+      div.classList.add('selected');
+      selectedVenueId = v.id;
+      updateSummary();
+      document.getElementById('summaryVenueImg').style.backgroundImage = `url(${v.img})`;
+      document.getElementById('summaryVenueImg').style.backgroundSize = 'cover';
+      document.getElementById('summaryVenueImg').style.backgroundPosition = 'center';
+      document.getElementById('sumVenue').textContent = v.name;
+    });
+
+    grid.appendChild(div);
+    if (v.id === preselect && avail) div.click();
+  });
+}
+
+async function loadVenuesForReserve() {
+  grid.innerHTML = `
+    <div style="grid-column:1/-1;color:var(--text-muted);font-size:.9rem;">
+      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+      Loading venues from database...
+    </div>`;
+
+  try {
+    const response = await fetch('backend/venues/get_venues.php');
+    const result = await response.json();
+
+    if (!result.success) throw new Error(result.message || 'Failed to load venues');
+
+    VENUES_DATA = (result.data.venues || []).map(normalizeVenue);
+    renderVenueOptions();
+  } catch (error) {
+    console.error('Reserve venues loading error:', error);
+    VENUES_DATA = [];
+    renderVenueOptions();
+    showToast('Could not load venues from database', 'error');
+  }
+}
+
 function updateSummary() {
   const d = document.getElementById('evtDate').value;
   const s = document.getElementById('evtStart').value;
   const e = document.getElementById('evtEnd').value;
   const n = document.getElementById('evtName').value;
   const a = document.getElementById('evtAttendees').value;
-  if (d) document.getElementById('sumDate').textContent = new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+
+  if (d) document.getElementById('sumDate').textContent = new Date(d).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+  else document.getElementById('sumDate').textContent = '—';
+
   if (s && e) document.getElementById('sumTime').textContent = s + ' – ' + e;
+  else document.getElementById('sumTime').textContent = '—';
+
   document.getElementById('sumEvent').textContent = n || '—';
   document.getElementById('sumAttendees').textContent = a ? a + ' people' : '—';
 }
@@ -228,24 +309,99 @@ function updateSummary() {
   document.getElementById(id).addEventListener('input', updateSummary);
 });
 
-// Submit
-document.getElementById('submitBtn').addEventListener('click', () => {
+async function submitBookingRequest() {
+  const user = getCurrentUser();
+  if (!user) {
+    showToast('Please login before submitting a booking request', 'info');
+    setTimeout(() => window.location.href = 'login.html', 1000);
+    return;
+  }
+
   const name = document.getElementById('evtName').value.trim();
+  const type = document.getElementById('evtType').value;
+  const attendees = document.getElementById('evtAttendees').value;
   const date = document.getElementById('evtDate').value;
+  const start = document.getElementById('evtStart').value;
+  const end = document.getElementById('evtEnd').value;
+  const desc = document.getElementById('evtDesc').value.trim();
+
   const orgName = document.getElementById('orgName').value.trim();
   const orgEmail = document.getElementById('orgEmail').value.trim();
-  if (!name || !date || !orgName || !orgEmail) { showToast('Please fill all required fields (*)', 'error'); return; }
-  if (!selectedVenueId) { showToast('Please select a venue', 'error'); return; }
-  const ref = 'NE-' + Date.now().toString(36).toUpperCase();
-  const booking = { ref, venueId:selectedVenueId, eventName:name, date, organizer:orgName, email:orgEmail, status:'pending', submitted:new Date().toISOString() };
-  const bks = JSON.parse(localStorage.getItem('najah_bookings')||'[]');
-  bks.push(booking);
-  localStorage.setItem('najah_bookings', JSON.stringify(bks));
-  document.getElementById('refNum').textContent = ref;
-  new bootstrap.Modal(document.getElementById('successModal')).show();
-});
+  const orgPhone = document.getElementById('orgPhone').value.trim();
+  const orgFaculty = document.getElementById('orgFaculty').value.trim();
+  const orgRoleText = document.getElementById('orgRole').value;
 
-// Checkbox styles
+  if (!name || !date || !orgName || !orgEmail) {
+    showToast('Please fill all required fields (*)', 'error');
+    return;
+  }
+
+  if (!selectedVenueId) {
+    showToast('Please select a venue', 'error');
+    return;
+  }
+
+  const selectedVenue = VENUES_DATA.find(v => v.id === selectedVenueId);
+  if (selectedVenue && attendees && Number(attendees) > selectedVenue.cap) {
+    showToast('Expected attendees exceed the selected venue capacity', 'error');
+    return;
+  }
+
+  const submitBtn = document.getElementById('submitBtn');
+  const originalHtml = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+
+  try {
+    const response = await fetch('backend/bookings/create_booking.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        venue_id: selectedVenueId,
+        event_name: name,
+        event_type: type,
+        expected_attendees: attendees ? Number(attendees) : 0,
+        event_date: date,
+        start_time: start,
+        end_time: end,
+        event_description: desc,
+        organizer_name: orgName,
+        organizer_email: orgEmail,
+        organizer_phone: orgPhone,
+        organization_or_faculty: orgFaculty,
+        organizer_role: roleToBackendValue(orgRoleText),
+        req_av_equipment: document.getElementById('reqAV').checked,
+        req_tables_chairs: document.getElementById('reqTables').checked,
+        req_security: document.getElementById('reqSecurity').checked,
+        req_catering_setup: document.getElementById('reqCatering').checked,
+        req_photography: document.getElementById('reqPhotog').checked,
+        req_live_streaming: document.getElementById('reqLive').checked,
+        additional_notes: document.getElementById('addNotes').value.trim()
+      })
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.message || 'Booking request failed');
+    }
+
+    const booking = result.data.booking;
+
+
+    document.getElementById('refNum').textContent = booking.ref_code;
+    new bootstrap.Modal(document.getElementById('successModal')).show();
+  } catch (error) {
+    console.error('Booking submit error:', error);
+    showToast(error.message || 'Could not submit booking request', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalHtml;
+  }
+}
+
+document.getElementById('submitBtn').addEventListener('click', submitBookingRequest);
+
 document.querySelectorAll('.req-checkbox').forEach(l => {
   l.style.cssText = 'display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--text-secondary);cursor:pointer;padding:0.35rem 0.85rem;border:1px solid var(--border-subtle);border-radius:100px;background:var(--bg-input);transition:var(--transition)';
   const cb = l.querySelector('input');
@@ -255,6 +411,9 @@ document.querySelectorAll('.req-checkbox').forEach(l => {
     l.style.color = cb.checked ? 'var(--gold)' : 'var(--text-secondary)';
   });
 });
+
+fillOrganizerFromUser();
+loadVenuesForReserve();
 </script>
 </body>
 </html>

@@ -1,22 +1,78 @@
 /* ═══════════════════════════════════════
    NAJAH EVENTS — VENUES PAGE JS
+   Backend connected version
 ═══════════════════════════════════════ */
 
-const VENUES = [
-  { id:1, name:'Main Auditorium', building:'Main Campus', type:'auditorium', capacity:800, area:'1,200 m²', status:'available', image:'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&q=80', features:['Stage','Sound System','Projector','Backstage','AC','Accessible'], notes:'Ideal for large conferences, keynote talks, and official ceremonies.' },
-  { id:2, name:'Engineering Hall', building:'Engineering Faculty', type:'hall', capacity:350, area:'650 m²', status:'busy', image:'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80', features:['Projector','Wi-Fi','Sound System','Seating','Whiteboard'], notes:'Great for tech talks, exhibitions, and mid-size community events.' },
-  { id:3, name:'Expo Hall', building:'Student Activities Center', type:'hall', capacity:600, area:'980 m²', status:'available', image:'https://images.unsplash.com/photo-1515169067868-5387ec356754?w=800&q=80', features:['Booths','Power Outlets','Wi-Fi','Open Space','AC'], notes:'Best for expos with booths — companies, projects fairs, and showcases.' },
-  { id:4, name:'Outdoor Stage', building:'Central Yard', type:'outdoor', capacity:1200, area:'Open Area', status:'available', image:'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&q=80', features:['Stage','Lighting','Outdoor Seating','Security','Generators'], notes:'Perfect for festivals, graduation vibes, and large student gatherings.' },
-  { id:5, name:'Workshop Room A', building:'Library Building', type:'classroom', capacity:60, area:'110 m²', status:'maintenance', image:'https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=800&q=80', features:['Whiteboard','Projector','Wi-Fi'], notes:'Small workshops and training. Currently under maintenance.' },
-  { id:6, name:'Computer Lab 2', building:'IT Center', type:'lab', capacity:40, area:'95 m²', status:'available', image:'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&q=80', features:['Computers','High-Speed Internet','Projector','AC','UPS'], notes:'Hands-on sessions: coding workshops, demos, and hack activities.' },
-  { id:7, name:'Faculty Seminar Room', building:'Admin Building', type:'classroom', capacity:80, area:'150 m²', status:'available', image:'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80', features:['Smart Board','Video Conference','AC','Projector'], notes:'Ideal for seminars, panels, and small conferences.' },
-  { id:8, name:'Sports Complex Hall', building:'Sports & Recreation', type:'outdoor', capacity:500, area:'2,000 m²', status:'busy', image:'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80', features:['Changing Rooms','Scoreboard','Bleachers','Security'], notes:'Multi-sport complex for tournaments and athletic events.' },
-];
+let VENUES = [];
 
-// ── KPIs ───────────────────────────────────
-document.getElementById('kpiTotal').textContent = VENUES.length;
-document.getElementById('kpiAvail').textContent = VENUES.filter(v => v.status === 'available').length;
-document.getElementById('kpiSeats').textContent = Math.max(...VENUES.map(v => v.capacity));
+function normalizeVenue(venue) {
+  const features = Array.isArray(venue.features)
+    ? venue.features
+    : String(venue.features || '')
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean);
+
+  return {
+    id: Number(venue.id),
+    name: venue.name || 'Untitled Venue',
+    building: venue.building || 'Najah University',
+    type: venue.type || 'hall',
+    capacity: Number(venue.capacity || 0),
+    area: venue.area || 'N/A',
+    status: venue.status || 'available',
+    image: venue.image || 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&q=80',
+    features,
+    notes: venue.notes || ''
+  };
+}
+
+function updateKpis() {
+  const total = document.getElementById('kpiTotal');
+  const available = document.getElementById('kpiAvail');
+  const seats = document.getElementById('kpiSeats');
+
+  if (total) total.textContent = VENUES.length;
+  if (available) available.textContent = VENUES.filter(v => v.status === 'available').length;
+  if (seats) seats.textContent = VENUES.length ? Math.max(...VENUES.map(v => v.capacity)) : 0;
+}
+
+async function loadVenues() {
+  const grid = document.getElementById('venuesGrid');
+  const count = document.getElementById('resultCount');
+
+  if (grid) {
+    grid.innerHTML = `
+      <div class="col-12 text-center py-5" style="color:var(--text-muted);">
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        Loading venues from database...
+      </div>`;
+  }
+
+  try {
+    const response = await fetch('backend/venues/get_venues.php');
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.message || 'Could not load venues');
+    }
+
+    VENUES = (result.data.venues || []).map(normalizeVenue);
+    updateKpis();
+    render(true);
+
+  } catch (error) {
+    console.error('Venues loading error:', error);
+    VENUES = [];
+    updateKpis();
+
+    if (grid) grid.innerHTML = '';
+    if (count) count.textContent = '0 venues found';
+
+    showToast('Could not load venues from database. Check Apache, MySQL, and the SQL import.', 'error');
+    render(true);
+  }
+}
 
 // ── Helpers ────────────────────────────────
 function statusBadge(s) {
@@ -61,11 +117,11 @@ const PER = 6;
 let shown = 0, list = [];
 
 function getFiltered() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const type = document.getElementById('typeSelect').value;
-  const av = document.getElementById('availSelect').value;
-  const only = document.getElementById('onlyAvail').checked;
-  const minC = parseInt(document.getElementById('minCap').value || '0', 10);
+  const q = document.getElementById('searchInput')?.value.trim().toLowerCase() || '';
+  const type = document.getElementById('typeSelect')?.value || 'all';
+  const av = document.getElementById('availSelect')?.value || 'all';
+  const only = document.getElementById('onlyAvail')?.checked || false;
+  const minC = parseInt(document.getElementById('minCap')?.value || '0', 10);
   return VENUES.filter(v => {
     const hay = (v.name + ' ' + v.building + ' ' + v.features.join(' ')).toLowerCase();
     if (q && !hay.includes(q)) return false;
@@ -78,7 +134,7 @@ function getFiltered() {
 }
 
 function getSort(arr) {
-  const s = document.getElementById('sortSelect').value;
+  const s = document.getElementById('sortSelect')?.value || 'recommended';
   const out = [...arr];
   if (s === 'cap_desc') out.sort((a, b) => b.capacity - a.capacity);
   else if (s === 'cap_asc') out.sort((a, b) => a.capacity - b.capacity);
@@ -92,6 +148,8 @@ function render(reset = false) {
   const empty = document.getElementById('emptyState');
   const loadBtn = document.getElementById('loadMoreBtn');
   const count = document.getElementById('resultCount');
+  if (!grid || !empty || !loadBtn || !count) return;
+
   if (reset) { shown = 0; grid.innerHTML = ''; list = getSort(getFiltered()); }
   const page = list.slice(shown, shown + PER);
   grid.insertAdjacentHTML('beforeend', page.map(renderCard).join(''));
@@ -102,10 +160,11 @@ function render(reset = false) {
 }
 
 // ── Detail Modal ───────────────────────────
-const modal = new bootstrap.Modal(document.getElementById('venueModal'));
+const venueModalElement = document.getElementById('venueModal');
+const modal = venueModalElement ? new bootstrap.Modal(venueModalElement) : null;
 
 function openDetails(id) {
-  const v = VENUES.find(x => x.id === id);
+  const v = VENUES.find(x => x.id === Number(id));
   if (!v) return;
   document.getElementById('mTitle').textContent = v.name;
   document.getElementById('mSub').textContent = `${typeLabel(v.type)} · ${v.building}`;
@@ -119,7 +178,7 @@ function openDetails(id) {
   bookBtn.href = `reserve.html?venue=${v.id}`;
   bookBtn.style.opacity = v.status === 'available' ? '1' : '0.4';
   bookBtn.style.pointerEvents = v.status === 'available' ? 'auto' : 'none';
-  modal.show();
+  modal?.show();
 }
 
 function bookVenue(id) {
@@ -133,12 +192,27 @@ function bookVenue(id) {
   const el = document.getElementById(id);
   if (el) { el.addEventListener('input', () => render(true)); el.addEventListener('change', () => render(true)); }
 });
-document.getElementById('clearBtn').addEventListener('click', () => {
-  ['searchInput','minCap'].forEach(id => document.getElementById(id).value = '');
-  ['typeSelect','availSelect','sortSelect'].forEach(id => document.getElementById(id).selectedIndex = 0);
-  document.getElementById('onlyAvail').checked = false;
-  render(true);
-});
-document.getElementById('loadMoreBtn').addEventListener('click', () => render(false));
 
-render(true);
+const clearBtn = document.getElementById('clearBtn');
+if (clearBtn) {
+  clearBtn.addEventListener('click', () => {
+    ['searchInput','minCap'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    ['typeSelect','availSelect','sortSelect'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.selectedIndex = 0;
+    });
+    const onlyAvail = document.getElementById('onlyAvail');
+    if (onlyAvail) onlyAvail.checked = false;
+    render(true);
+  });
+}
+
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+if (loadMoreBtn) {
+  loadMoreBtn.addEventListener('click', () => render(false));
+}
+
+loadVenues();

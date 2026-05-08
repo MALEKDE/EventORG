@@ -42,6 +42,11 @@
     .ni-text{font-size:0.84rem;color:var(--text-secondary);}
     .ni-time{font-size:0.72rem;color:var(--text-muted);margin-top:0.2rem;}
     .profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--gold-subtle);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2rem;font-family:var(--font-display);font-weight:700;color:var(--gold);}
+    .action-btn{background:none;border:1px solid var(--border-subtle);border-radius:6px;padding:0.28rem 0.7rem;font-size:0.75rem;cursor:pointer;transition:var(--transition);font-family:var(--font-body);white-space:nowrap;}
+    .action-approve{color:#34d399;border-color:rgba(52,211,153,0.3);}
+    .action-approve:hover{background:rgba(52,211,153,0.1);}
+    .action-reject{color:#f87171;border-color:rgba(248,113,113,0.3);}
+    .action-reject:hover{background:rgba(248,113,113,0.1);}
   </style>
 </head>
 <body>
@@ -68,6 +73,7 @@
         <a href="#" class="active" data-tab="overview"><i class="bi bi-grid-1x2"></i> Overview</a>
         <a href="#" data-tab="bookings"><i class="bi bi-calendar2-check"></i> My Bookings</a>
         <a href="#" data-tab="events"><i class="bi bi-ticket-perforated"></i> My Events</a>
+        <a href="#" data-tab="clubs"><i class="bi bi-people"></i> My Clubs</a>
         <a href="#" data-tab="notifications"><i class="bi bi-bell"></i> Notifications</a>
       </nav>
       <div class="sidebar-section">Quick Links</div>
@@ -144,6 +150,20 @@
         <div id="eventsEmpty" class="empty-state" style="display:none;"><i class="bi bi-ticket-perforated"></i><h5 style="font-family:var(--font-display);color:var(--text-secondary);">No events registered</h5><p><a href="events.html" style="color:var(--gold);">Explore events</a></p></div>
       </div>
 
+      <!-- Clubs Tab -->
+      <div id="dashClubs" class="tab-pane">
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+          <h4 style="font-family:var(--font-display);margin-bottom:0;">My Clubs</h4>
+          <a href="clubs.html" class="btn-gold" style="font-size:0.83rem;padding:0.5rem 1.25rem;"><i class="bi bi-plus me-1"></i>Join More Clubs</a>
+        </div>
+        <div class="row g-3 mb-4" id="myClubsList"></div>
+        <div id="clubsEmpty" class="empty-state" style="display:none;"><i class="bi bi-people"></i><h5 style="font-family:var(--font-display);color:var(--text-secondary);">No clubs joined yet</h5><p><a href="clubs.html" style="color:var(--gold);">Explore clubs</a></p></div>
+
+        <h5 style="font-family:var(--font-display);font-size:1rem;margin:1.5rem 0 1rem;">Club Join Requests</h5>
+        <div id="clubRequestsList" class="d-flex flex-column gap-2"></div>
+        <div id="clubRequestsEmpty" class="empty-state" style="display:none;"><i class="bi bi-inbox"></i><p>No club join requests yet.</p></div>
+      </div>
+
       <!-- Notifications Tab -->
       <div id="dashNotifications" class="tab-pane">
         <h4 style="font-family:var(--font-display);margin-bottom:1.5rem;">All Notifications</h4>
@@ -185,151 +205,661 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="global.js"></script>
 <script>
-const user = getCurrentUser();
-if (!user) { window.location.href = 'login.html'; }
-
-const SAMPLE_BOOKINGS = [
-  {ref:'NE-AABB1',eventName:'Career Expo 2026',venue:'Main Auditorium',date:'2026-04-12',status:'approved'},
-  {ref:'NE-BBCC2',eventName:'Hackathon Night',venue:'Computer Lab 2',date:'2026-04-20',status:'pending'},
-  {ref:'NE-CCDD3',eventName:'Club Meeting',venue:'Workshop Room A',date:'2026-03-30',status:'rejected'},
-];
-const SAMPLE_NOTIFS = [
-  {text:'Your booking NE-AABB1 has been approved!',time:'2 hours ago',color:'#34d399',icon:'bi-check-circle-fill'},
-  {text:'Career Expo 2026 is tomorrow — Don\'t forget!',time:'1 day ago',color:'var(--gold)',icon:'bi-calendar-event-fill'},
-  {text:'New event: Spring Cultural Festival is now open.',time:'3 days ago',color:'#a78bfa',icon:'bi-megaphone-fill'},
-];
-const SAMPLE_EVENTS = [
-  {title:'TechTalk Summit',date:'Apr 5',venue:'Engineering Hall',img:'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=300&q=80',cat:'Conference'},
-  {title:'Projects Fair',date:'May 1',venue:'Expo Hall',img:'https://images.unsplash.com/photo-1558008258-3256797b43f3?w=300&q=80',cat:'Workshop'},
-  {title:'Spring Festival',date:'May 15',venue:'Outdoor Stage',img:'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=300&q=80',cat:'Festival'},
-];
-
-function getBookings() {
-  const stored = JSON.parse(localStorage.getItem('najah_bookings')||'[]');
-  return [...SAMPLE_BOOKINGS, ...stored.map(b => ({...b, eventName:b.eventName||'Custom Event', venue:'Selected Venue'}))];
+const cachedDashboardUser = getCurrentUser();
+if (cachedDashboardUser && normalizeRole(cachedDashboardUser.role) === 'admin') {
+  window.location.replace('admin.html');
 }
 
-function getRegistrations() {
-  return JSON.parse(localStorage.getItem('najah_registrations')||'[]');
+let dashboardData = {
+  user: null,
+  stats: {},
+  bookings: [],
+  registrations: [],
+  club_memberships: [],
+  club_requests: [],
+  managed_club: null,
+  managed_club_requests: [],
+  managed_club_members: [],
+  notifications: [],
+  suggested_events: []
+};
+
+let bookings = [];
+let registrations = [];
+let clubMemberships = [];
+let clubRequests = [];
+let managedClub = null;
+let managedClubRequests = [];
+let managedClubMembers = [];
+let notifications = [];
+let suggestedEvents = [];
+let user = getCurrentUser();
+let currentBookingFilter = 'all';
+
+function esc(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
-// Greeting
-const hour = new Date().getHours();
-const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-const nameStr = user ? user.name || 'Student' : 'Guest';
-document.getElementById('dashGreeting').textContent = greet + ', ' + nameStr.split(' ')[0] + '!';
+function normalizeUser(userData) {
+  if (!userData) return null;
+  return {
+    user_id: userData.user_id,
+    id: userData.student_id || userData.user_id,
+    name: userData.full_name || userData.name || 'User',
+    full_name: userData.full_name || userData.name || 'User',
+    email: userData.email || '',
+    role: userData.role || 'student',
+    phone: userData.phone || '',
+    student_id: userData.student_id || '',
+    organization_name: userData.organization_name || ''
+  };
+}
 
-// Sidebar profile
-document.getElementById('sidebarProfile').innerHTML = `
-  <div style="display:flex;align-items:center;gap:0.75rem;">
-    <div style="width:40px;height:40px;border-radius:50%;background:var(--gold-subtle);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem;font-family:var(--font-display);font-weight:700;color:var(--gold);flex-shrink:0;">${(nameStr[0]||'U').toUpperCase()}</div>
-    <div><div style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">${nameStr}</div><div style="font-size:0.72rem;color:var(--text-muted);text-transform:capitalize;">${user?.role||'Student'}</div></div>
-  </div>`;
+function formatDate(dateValue, options = { day: 'numeric', month: 'short', year: 'numeric' }) {
+  if (!dateValue) return '—';
+  const d = new Date(dateValue + 'T00:00:00');
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-GB', options);
+}
 
-// KPIs
-const bookings = getBookings();
-const approved = bookings.filter(b=>b.status==='approved').length;
-const pending = bookings.filter(b=>b.status==='pending').length;
-const regs = getRegistrations();
-document.getElementById('kpiGrid').innerHTML = [
-  {icon:'bi-calendar2-check',bg:'var(--gold-subtle)',ic:'var(--gold)',val:bookings.length,lbl:'Total Bookings'},
-  {icon:'bi-check-circle',bg:'rgba(52,211,153,0.1)',ic:'#34d399',val:approved,lbl:'Approved'},
-  {icon:'bi-clock-history',bg:'rgba(251,191,36,0.1)',ic:'#fbbf24',val:pending,lbl:'Pending'},
-  {icon:'bi-ticket-perforated',bg:'rgba(139,92,246,0.1)',ic:'#a78bfa',val:regs.length,lbl:'Events Joined'},
-].map(k=>`<div class="kpi-card"><div class="kpi-icon" style="background:${k.bg};color:${k.ic};"><i class="bi ${k.icon}"></i></div><div class="kpi-val">${k.val}</div><div class="kpi-lbl">${k.lbl}</div></div>`).join('');
+function timeAgo(dateValue) {
+  if (!dateValue) return 'Just now';
+  const date = new Date(String(dateValue).replace(' ', 'T'));
+  if (Number.isNaN(date.getTime())) return 'Recently';
 
-// Recent bookings
+  const diff = Math.max(0, Date.now() - date.getTime());
+  const mins = Math.floor(diff / 60000);
+  const hours = Math.floor(mins / 60);
+  const days = Math.floor(hours / 24);
+
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return mins + ' min ago';
+  if (hours < 24) return hours + ' hour' + (hours === 1 ? '' : 's') + ' ago';
+  if (days < 7) return days + ' day' + (days === 1 ? '' : 's') + ' ago';
+  return formatDate(dateValue.split(' ')[0]);
+}
+
+function roleLabel(role) {
+  const labels = {
+    student: 'Student',
+    company: 'Company',
+    club: 'Club',
+    admin: 'Admin'
+  };
+  return labels[role] || 'Student';
+}
+
+function setLoadingState() {
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi-card" style="grid-column:1/-1;text-align:center;color:var(--text-muted);">
+      <span class="spinner-border spinner-border-sm me-2"></span>Loading dashboard data...
+    </div>`;
+}
+
+async function apiPost(url, data = {}) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  const text = await response.text();
+  let result;
+  try {
+    result = JSON.parse(text);
+  } catch (jsonError) {
+    console.error('PHP raw response:', text);
+    throw new Error('Backend did not return valid JSON.');
+  }
+
+  if (!result.success) {
+    throw new Error(result.message || 'Request failed');
+  }
+
+  return result.data;
+}
+
+async function loadDashboardData() {
+  setLoadingState();
+
+  try {
+    const response = await fetch('backend/dashboard/user_dashboard.php', {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+
+    const text = await response.text();
+    let result;
+
+    try {
+      result = JSON.parse(text);
+    } catch (jsonError) {
+      console.error('Dashboard PHP raw response:', text);
+      throw new Error('Dashboard endpoint did not return valid JSON.');
+    }
+
+    if (!result.success) {
+      if (response.status === 401) {
+        localStorage.removeItem('najah_user');
+        window.location.href = 'login.html';
+        return;
+      }
+      throw new Error(result.message || 'Failed to load dashboard.');
+    }
+
+    dashboardData = result.data;
+    user = normalizeUser(dashboardData.user);
+
+    if (user && normalizeRole(user.role) === 'admin') {
+      window.location.replace('admin.html');
+      return;
+    }
+
+    bookings = dashboardData.bookings || [];
+    registrations = dashboardData.registrations || [];
+    clubMemberships = dashboardData.club_memberships || [];
+    clubRequests = dashboardData.club_requests || [];
+    managedClub = dashboardData.managed_club || null;
+    managedClubRequests = dashboardData.managed_club_requests || [];
+    managedClubMembers = dashboardData.managed_club_members || [];
+    notifications = dashboardData.notifications || [];
+    suggestedEvents = dashboardData.suggested_events || [];
+
+    setCurrentUser(user);
+    renderNavUser();
+    renderDashboard();
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || 'Failed to load dashboard data', 'error');
+    document.getElementById('kpiGrid').innerHTML = `
+      <div class="kpi-card" style="grid-column:1/-1;text-align:center;">
+        <div style="color:#f87171;font-weight:600;margin-bottom:0.4rem;">Could not load dashboard data.</div>
+        <div style="color:var(--text-muted);font-size:0.85rem;">Make sure Apache, MySQL, and the database are running.</div>
+      </div>`;
+  }
+}
+
+function renderDashboard() {
+  if (!user) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  renderGreeting();
+  renderRoleAction();
+  renderSidebarProfile();
+  configureRoleNavigation();
+  renderKpis();
+  renderBookings();
+  renderNotifications();
+  renderSuggestedEvents();
+  renderRegisteredEvents();
+  renderClubs();
+  renderProfile();
+}
+
+function renderGreeting() {
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const firstName = (user.name || 'User').split(' ')[0];
+  document.getElementById('dashGreeting').textContent = `${greet}, ${firstName}!`;
+}
+
+function renderRoleAction() {
+  const actionBtn = document.querySelector('#dashOverview .btn-gold');
+  if (!actionBtn) return;
+
+  const role = normalizeRole(user.role);
+
+  if (role === 'student') {
+    actionBtn.href = 'events.html';
+    actionBtn.removeAttribute('onclick');
+    actionBtn.innerHTML = '<i class="bi bi-compass me-1"></i> Explore Events';
+  } else if (role === 'club') {
+    actionBtn.href = '#';
+    actionBtn.setAttribute('onclick', "switchTab('clubs'); return false;");
+    actionBtn.innerHTML = '<i class="bi bi-people me-1"></i> Manage Club';
+  } else {
+    actionBtn.href = 'reserve.html';
+    actionBtn.removeAttribute('onclick');
+    actionBtn.innerHTML = '<i class="bi bi-plus me-1"></i> New Booking';
+  }
+}
+
+function renderSidebarProfile() {
+  document.getElementById('sidebarProfile').innerHTML = `
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--gold-subtle);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem;font-family:var(--font-display);font-weight:700;color:var(--gold);flex-shrink:0;">${esc((user.name || 'U')[0]).toUpperCase()}</div>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">${esc(user.name)}</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);text-transform:capitalize;">${esc(roleLabel(user.role))}</div>
+      </div>
+    </div>`;
+}
+
+function configureRoleNavigation() {
+  const role = normalizeRole(user.role);
+  const clubsLink = document.querySelector('.sidebar-nav a[data-tab="clubs"]');
+  const bookingsLink = document.querySelector('.sidebar-nav a[data-tab="bookings"]');
+  const eventsLink = document.querySelector('.sidebar-nav a[data-tab="events"]');
+
+  if (clubsLink) {
+    clubsLink.innerHTML = role === 'club'
+      ? '<i class="bi bi-people"></i> Club Management'
+      : '<i class="bi bi-people"></i> My Clubs';
+  }
+
+  if (bookingsLink) {
+    bookingsLink.innerHTML = role === 'company'
+      ? '<i class="bi bi-calendar2-check"></i> Company Bookings'
+      : '<i class="bi bi-calendar2-check"></i> My Bookings';
+  }
+
+  if (eventsLink) {
+    eventsLink.innerHTML = role === 'club'
+      ? '<i class="bi bi-ticket-perforated"></i> Joined Events'
+      : '<i class="bi bi-ticket-perforated"></i> My Events';
+  }
+}
+
+function renderKpis() {
+  const stats = dashboardData.stats || {};
+  const role = normalizeRole(user.role);
+  const kpis = role === 'club'
+    ? [
+        { icon: 'bi-building', bg: 'var(--gold-subtle)', ic: 'var(--gold)', val: stats.total_bookings || 0, lbl: 'Venue Bookings' },
+        { icon: 'bi-person-plus', bg: 'rgba(251,191,36,0.1)', ic: '#fbbf24', val: stats.managed_club_pending_requests || 0, lbl: 'Join Requests' },
+        { icon: 'bi-people', bg: 'rgba(52,211,153,0.1)', ic: '#34d399', val: stats.managed_club_members || 0, lbl: 'Club Members' },
+        { icon: 'bi-ticket-perforated', bg: 'rgba(139,92,246,0.1)', ic: '#a78bfa', val: stats.events_joined || 0, lbl: 'Events Joined' }
+      ]
+    : [
+        { icon: 'bi-calendar2-check', bg: 'var(--gold-subtle)', ic: 'var(--gold)', val: stats.total_bookings || 0, lbl: 'Total Bookings' },
+        { icon: 'bi-check-circle', bg: 'rgba(52,211,153,0.1)', ic: '#34d399', val: stats.approved_bookings || 0, lbl: 'Approved' },
+        { icon: 'bi-clock-history', bg: 'rgba(251,191,36,0.1)', ic: '#fbbf24', val: stats.pending_bookings || 0, lbl: 'Pending' },
+        { icon: 'bi-ticket-perforated', bg: 'rgba(139,92,246,0.1)', ic: '#a78bfa', val: stats.events_joined || 0, lbl: 'Events Joined' },
+        { icon: 'bi-people', bg: 'rgba(52,211,153,0.1)', ic: '#34d399', val: stats.clubs_joined || 0, lbl: 'Clubs Joined' }
+      ];
+
+  document.getElementById('kpiGrid').innerHTML = kpis.map(k => `
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:${k.bg};color:${k.ic};"><i class="bi ${k.icon}"></i></div>
+      <div class="kpi-val">${k.val}</div>
+      <div class="kpi-lbl">${k.lbl}</div>
+    </div>`).join('');
+}
+
 function renderBookingRow(b) {
-  const statusMap = {approved:'<span class="badge-available">Approved</span>',pending:'<span class="badge-busy">Pending</span>',rejected:'<span class="badge-maintenance">Rejected</span>'};
-  const iconMap = {approved:{bg:'rgba(52,211,153,0.1)',ic:'#34d399',i:'bi-check2'},pending:{bg:'rgba(251,191,36,0.1)',ic:'#fbbf24',i:'bi-clock'},rejected:{bg:'rgba(248,113,113,0.1)',ic:'#f87171',i:'bi-x'}};
-  const s = iconMap[b.status]||iconMap.pending;
-  const dateStr = b.date ? new Date(b.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
-  return `<div class="booking-row"><div class="br-icon" style="background:${s.bg};color:${s.ic};"><i class="bi ${s.i}"></i></div><div class="flex-grow-1"><div class="br-title">${b.eventName||'Unnamed Event'}</div><div class="br-meta"><i class="bi bi-building me-1"></i>${b.venue||'—'} · ${dateStr} · <span style="color:var(--text-muted);font-size:0.7rem;">${b.ref||''}</span></div></div>${statusMap[b.status]||''}</div>`;
+  const status = b.status || 'pending';
+  const statusMap = {
+    approved: '<span class="badge-available">Approved</span>',
+    pending: '<span class="badge-busy">Pending</span>',
+    rejected: '<span class="badge-maintenance">Rejected</span>',
+    cancelled: '<span class="badge-maintenance">Cancelled</span>'
+  };
+
+  const iconMap = {
+    approved: { bg: 'rgba(52,211,153,0.1)', ic: '#34d399', i: 'bi-check2' },
+    pending: { bg: 'rgba(251,191,36,0.1)', ic: '#fbbf24', i: 'bi-clock' },
+    rejected: { bg: 'rgba(248,113,113,0.1)', ic: '#f87171', i: 'bi-x' },
+    cancelled: { bg: 'rgba(148,163,184,0.1)', ic: '#94a3b8', i: 'bi-dash-circle' }
+  };
+
+  const s = iconMap[status] || iconMap.pending;
+  const note = b.admin_note ? `<div class="br-meta" style="color:#f87171;"><i class="bi bi-chat-left-text me-1"></i>${esc(b.admin_note)}</div>` : '';
+
+  return `
+    <div class="booking-row">
+      <div class="br-icon" style="background:${s.bg};color:${s.ic};"><i class="bi ${s.i}"></i></div>
+      <div class="flex-grow-1">
+        <div class="br-title">${esc(b.event_name || 'Unnamed Event')}</div>
+        <div class="br-meta">
+          <i class="bi bi-building me-1"></i>${esc(b.venue_name || '—')} · ${formatDate(b.event_date)} · <span style="color:var(--text-muted);font-size:0.7rem;">${esc(b.ref_code || '')}</span>
+        </div>
+        ${note}
+      </div>
+      ${statusMap[status] || ''}
+    </div>`;
 }
 
-document.getElementById('recentBookings').innerHTML = bookings.slice(0,3).map(renderBookingRow).join('') || '<div class="empty-state" style="padding:2rem;"><i class="bi bi-calendar-x"></i><p>No bookings yet</p></div>';
+function renderBookings() {
+  const recent = document.getElementById('recentBookings');
+  const list = document.getElementById('bookingsList');
+  const empty = document.getElementById('bookingsEmpty');
 
-// Notifs widget
+  recent.innerHTML = bookings.length
+    ? bookings.slice(0, 3).map(renderBookingRow).join('')
+    : '<div class="empty-state" style="padding:2rem;"><i class="bi bi-calendar-x"></i><p>No bookings yet</p></div>';
+
+  const filtered = currentBookingFilter === 'all'
+    ? bookings
+    : bookings.filter(b => b.status === currentBookingFilter);
+
+  list.innerHTML = filtered.length
+    ? filtered.map(renderBookingRow).join('')
+    : '<div class="empty-state"><i class="bi bi-inbox"></i><p>No bookings with this status</p></div>';
+
+  empty.style.display = bookings.length ? 'none' : 'block';
+}
+
+function notificationStyle(type) {
+  const styles = {
+    success: { color: '#34d399', icon: 'bi-check-circle-fill' },
+    warning: { color: '#fbbf24', icon: 'bi-exclamation-triangle-fill' },
+    error: { color: '#f87171', icon: 'bi-x-circle-fill' },
+    info: { color: 'var(--gold)', icon: 'bi-info-circle-fill' }
+  };
+  return styles[type] || styles.info;
+}
+
 function renderNotif(n) {
-  return `<div class="notif-item"><div class="ni-dot" style="background:${n.color};"></div><div><div class="ni-text"><i class="bi ${n.icon} me-1" style="color:${n.color};"></i>${n.text}</div><div class="ni-time">${n.time}</div></div></div>`;
+  const style = notificationStyle(n.type);
+  return `
+    <div class="notif-item">
+      <div class="ni-dot" style="background:${style.color};"></div>
+      <div>
+        <div class="ni-text"><i class="bi ${style.icon} me-1" style="color:${style.color};"></i>${esc(n.message || n.title || 'Notification')}</div>
+        <div class="ni-time">${timeAgo(n.created_at)}</div>
+      </div>
+    </div>`;
 }
-document.getElementById('notifsWidget').innerHTML = SAMPLE_NOTIFS.map(renderNotif).join('');
-document.getElementById('allNotifs').innerHTML = SAMPLE_NOTIFS.map(renderNotif).join('');
+
+function renderNotifications() {
+  const widget = document.getElementById('notifsWidget');
+  const all = document.getElementById('allNotifs');
+
+  const html = notifications.length
+    ? notifications.map(renderNotif).join('')
+    : '<div style="text-align:center;padding:1rem;font-size:0.85rem;color:var(--text-muted);">No notifications yet.</div>';
+
+  widget.innerHTML = html;
+  all.innerHTML = html;
+
+  const bellCount = document.querySelector('#mainNav .btn-ghost span');
+  if (bellCount) bellCount.textContent = dashboardData.stats?.unread_notifications || 0;
+}
 
 function clearNotifs() {
   document.getElementById('notifsWidget').innerHTML = '<div style="text-align:center;padding:1rem;font-size:0.85rem;color:var(--text-muted);">All caught up! ✓</div>';
-  showToast('Notifications cleared', 'info');
+  showToast('Notifications cleared from view', 'info');
 }
 
-// Suggested events
-document.getElementById('suggestedEvents').innerHTML = SAMPLE_EVENTS.map(e=>`
-  <div class="col-md-4">
-    <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;transition:var(--transition);" onmouseover="this.style.borderColor='var(--border)'" onmouseout="this.style.borderColor='var(--border-subtle)'">
-      <img src="${e.img}" style="width:100%;height:130px;object-fit:cover;" alt="">
-      <div style="padding:1rem;">
-        <div class="badge-category" style="font-size:0.65rem;margin-bottom:0.5rem;">${e.cat}</div>
-        <div style="font-family:var(--font-display);font-weight:700;font-size:0.9rem;margin-bottom:0.25rem;">${e.title}</div>
-        <div style="font-size:0.75rem;color:var(--text-muted);">${e.date} · ${e.venue}</div>
-        <a href="events.html" class="btn-gold mt-2 w-100 justify-content-center" style="font-size:0.78rem;padding:0.4rem;">Register</a>
+function renderSuggestedEvents() {
+  const target = document.getElementById('suggestedEvents');
+
+  if (!suggestedEvents.length) {
+    target.innerHTML = '<div class="col-12"><div class="empty-state" style="padding:2rem;"><i class="bi bi-calendar-event"></i><p>No suggested events right now.</p></div></div>';
+    return;
+  }
+
+  target.innerHTML = suggestedEvents.map(e => `
+    <div class="col-md-4">
+      <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;transition:var(--transition);" onmouseover="this.style.borderColor='var(--border)'" onmouseout="this.style.borderColor='var(--border-subtle)'">
+        <img src="${esc(e.image_url || 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=300&q=80')}" style="width:100%;height:130px;object-fit:cover;" alt="${esc(e.title)}">
+        <div style="padding:1rem;">
+          <div class="badge-category" style="font-size:0.65rem;margin-bottom:0.5rem;">${esc(e.category)}</div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:0.9rem;margin-bottom:0.25rem;">${esc(e.title)}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);">${formatDate(e.event_date, { day: 'numeric', month: 'short' })} · ${esc(e.venue_name)}</div>
+          <a href="events.html" class="btn-gold mt-2 w-100 justify-content-center" style="font-size:0.78rem;padding:0.4rem;">Register</a>
+        </div>
       </div>
-    </div>
-  </div>`).join('');
+    </div>`).join('');
+}
 
-// Bookings tab
-document.getElementById('bookingsList').innerHTML = bookings.map(renderBookingRow).join('');
-if (!bookings.length) document.getElementById('bookingsEmpty').style.display='block';
+function renderRegisteredEvents() {
+  const list = document.getElementById('myEventsList');
+  const empty = document.getElementById('eventsEmpty');
 
-// Events tab
-const myRegs = getRegistrations();
-if (myRegs.length) {
-  document.getElementById('myEventsList').innerHTML = myRegs.map(r=>`
+  if (!registrations.length) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.innerHTML = registrations.map(r => `
     <div class="col-md-6">
       <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1.1rem;display:flex;align-items:center;gap:1rem;">
         <div style="width:44px;height:44px;background:rgba(139,92,246,0.1);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:#a78bfa;flex-shrink:0;"><i class="bi bi-ticket-perforated"></i></div>
-        <div><div style="font-weight:600;font-size:0.9rem;">${r.eventTitle||'Event'}</div><div style="font-size:0.75rem;color:var(--text-muted);">Registered · ${new Date(r.date||Date.now()).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div></div>
+        <div>
+          <div style="font-weight:600;font-size:0.9rem;">${esc(r.event_title || 'Event')}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);">${formatDate(r.event_date)} · ${esc(r.venue_name || '')}</div>
+        </div>
         <span class="badge-available ms-auto">Confirmed</span>
       </div>
     </div>`).join('');
-} else { document.getElementById('eventsEmpty').style.display='block'; }
+}
 
-// Profile
-if (user) {
-  document.getElementById('profAvatar').textContent = (user.name||'U')[0].toUpperCase();
-  document.getElementById('profName').textContent = user.name||'User';
-  document.getElementById('profRole').textContent = (user.role||'student').charAt(0).toUpperCase() + (user.role||'student').slice(1);
-  document.getElementById('profEmail').textContent = user.email||'';
-  document.getElementById('editName').value = user.name||'';
-  document.getElementById('editEmail').value = user.email||'';
+
+function clubStatusBadge(status) {
+  const map = {
+    approved: '<span class="badge-available">Approved</span>',
+    pending: '<span class="badge-busy">Pending</span>',
+    rejected: '<span class="badge-maintenance">Rejected</span>'
+  };
+  return map[status] || `<span class="badge-busy">${esc(status || 'Unknown')}</span>`;
+}
+
+function renderClubs() {
+  const role = normalizeRole(user.role);
+
+  if (role === 'club') {
+    renderClubLeaderDashboard();
+    return;
+  }
+
+  const clubsList = document.getElementById('myClubsList');
+  const clubsEmpty = document.getElementById('clubsEmpty');
+  const requestsList = document.getElementById('clubRequestsList');
+  const requestsEmpty = document.getElementById('clubRequestsEmpty');
+
+  if (clubMemberships.length) {
+    clubsEmpty.style.display = 'none';
+    clubsList.innerHTML = clubMemberships.map(c => `
+      <div class="col-md-6">
+        <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1.1rem;display:flex;align-items:center;gap:1rem;">
+          <div style="width:46px;height:46px;background:rgba(52,211,153,0.1);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:#34d399;font-size:1.2rem;flex-shrink:0;">${esc(c.icon || '👥')}</div>
+          <div class="flex-grow-1">
+            <div style="font-weight:600;font-size:0.9rem;color:var(--text-primary);">${esc(c.club_name)}</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">${esc(c.category)} · ${esc(c.member_role)}</div>
+          </div>
+          <span class="badge-available">Member</span>
+        </div>
+      </div>`).join('');
+  } else {
+    clubsList.innerHTML = '';
+    clubsEmpty.style.display = 'block';
+  }
+
+  if (clubRequests.length) {
+    requestsEmpty.style.display = 'none';
+    requestsList.innerHTML = clubRequests.map(r => `
+      <div class="booking-row">
+        <div class="br-icon" style="background:rgba(52,211,153,0.1);color:#34d399;"><i class="bi bi-person-plus"></i></div>
+        <div class="flex-grow-1">
+          <div class="br-title">${esc(r.club_name)}</div>
+          <div class="br-meta">${esc(r.category)} · Sent ${timeAgo(r.created_at)}</div>
+          ${r.admin_note ? `<div class="br-meta" style="color:#f87171;"><i class="bi bi-chat-left-text me-1"></i>${esc(r.admin_note)}</div>` : ''}
+        </div>
+        ${clubStatusBadge(r.status)}
+      </div>`).join('');
+  } else {
+    requestsList.innerHTML = '';
+    requestsEmpty.style.display = 'block';
+  }
+}
+
+function renderClubLeaderDashboard() {
+  const pane = document.getElementById('dashClubs');
+
+  if (!managedClub) {
+    pane.innerHTML = `
+      <div class="empty-state" style="padding:3rem;">
+        <i class="bi bi-building-x"></i>
+        <h5 style="font-family:var(--font-display);color:var(--text-secondary);">No club assigned to this account</h5>
+        <p style="max-width:520px;margin:auto;color:var(--text-muted);">Ask the admin/database owner to link this club account to a club using <code>clubs.leader_user_id</code>.</p>
+      </div>`;
+    return;
+  }
+
+  const pending = managedClubRequests.filter(r => r.status === 'pending');
+  const reviewed = managedClubRequests.filter(r => r.status !== 'pending');
+
+  pane.innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+      <div>
+        <h4 style="font-family:var(--font-display);margin-bottom:0.25rem;">Club Dashboard</h4>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin:0;">Manage ${esc(managedClub.club_name)} join requests and members.</p>
+      </div>
+      <a href="reserve.html" class="btn-gold" style="font-size:0.83rem;padding:0.5rem 1.25rem;"><i class="bi bi-plus-circle me-1"></i>Book Venue</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background:var(--gold-subtle);color:var(--gold);">${esc(managedClub.icon || '👥')}</div>
+          <div class="kpi-val" style="font-size:1.1rem;line-height:1.25;">${esc(managedClub.club_name)}</div>
+          <div class="kpi-lbl">${esc(managedClub.category || 'Club')}</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="kpi-card"><div class="kpi-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;"><i class="bi bi-person-plus"></i></div><div class="kpi-val">${pending.length}</div><div class="kpi-lbl">Pending Requests</div></div>
+      </div>
+      <div class="col-md-4">
+        <div class="kpi-card"><div class="kpi-icon" style="background:rgba(52,211,153,0.1);color:#34d399;"><i class="bi bi-people"></i></div><div class="kpi-val">${managedClubMembers.length}</div><div class="kpi-lbl">Members</div></div>
+      </div>
+    </div>
+
+    <h5 style="font-family:var(--font-display);font-size:1rem;margin:1.5rem 0 1rem;">Pending Join Requests</h5>
+    <div class="d-flex flex-column gap-2 mb-4">
+      ${pending.length ? pending.map(renderManagedClubRequestRow).join('') : '<div class="empty-state"><i class="bi bi-inbox"></i><p>No pending join requests.</p></div>'}
+    </div>
+
+    <h5 style="font-family:var(--font-display);font-size:1rem;margin:1.5rem 0 1rem;">Club Members</h5>
+    <div class="d-flex flex-column gap-2 mb-4">
+      ${managedClubMembers.length ? managedClubMembers.map(renderManagedClubMemberRow).join('') : '<div class="empty-state"><i class="bi bi-person"></i><p>No approved members yet.</p></div>'}
+    </div>
+
+    <h5 style="font-family:var(--font-display);font-size:1rem;margin:1.5rem 0 1rem;">Reviewed Requests</h5>
+    <div class="d-flex flex-column gap-2">
+      ${reviewed.length ? reviewed.map(renderManagedClubRequestRow).join('') : '<div class="empty-state"><i class="bi bi-check2-circle"></i><p>No reviewed requests yet.</p></div>'}
+    </div>`;
+}
+
+function renderManagedClubRequestRow(r) {
+  const actions = r.status === 'pending'
+    ? `<button class="action-btn action-approve me-1" onclick="approveManagedClubRequest(${Number(r.request_id)})">Approve</button><button class="action-btn action-reject" onclick="rejectManagedClubRequest(${Number(r.request_id)})">Reject</button>`
+    : clubStatusBadge(r.status);
+
+  return `
+    <div class="booking-row">
+      <div class="br-icon" style="background:rgba(52,211,153,0.1);color:#34d399;"><i class="bi bi-person-plus"></i></div>
+      <div class="flex-grow-1">
+        <div class="br-title">${esc(r.full_name)}</div>
+        <div class="br-meta">${esc(r.user_email || '')} · ID: ${esc(r.student_id || '—')} · Sent ${timeAgo(r.created_at)}</div>
+        ${r.reason ? `<div class="br-meta"><i class="bi bi-chat-left-text me-1"></i>${esc(r.reason)}</div>` : ''}
+        ${r.admin_note ? `<div class="br-meta" style="color:${r.status === 'rejected' ? '#f87171' : '#34d399'};"><i class="bi bi-info-circle me-1"></i>${esc(r.admin_note)}</div>` : ''}
+      </div>
+      <div>${actions}</div>
+    </div>`;
+}
+
+function renderManagedClubMemberRow(m) {
+  return `
+    <div class="booking-row">
+      <div class="br-icon" style="background:var(--gold-subtle);color:var(--gold);"><i class="bi bi-person-check"></i></div>
+      <div class="flex-grow-1">
+        <div class="br-title">${esc(m.full_name)}</div>
+        <div class="br-meta">${esc(m.email || '')} · ${esc(m.student_id || 'No ID')} · Joined ${timeAgo(m.joined_at)}</div>
+      </div>
+      <span class="badge-available">${esc(m.member_role || 'member')}</span>
+    </div>`;
+}
+
+async function approveManagedClubRequest(requestId) {
+  if (!confirm('Approve this student join request?')) return;
+  try {
+    await apiPost('backend/clubs/approve_join_request.php', { request_id: requestId });
+    showToast('Club join request approved', 'success');
+    await loadDashboardData();
+    switchTab('clubs');
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || 'Failed to approve request', 'error');
+  }
+}
+
+async function rejectManagedClubRequest(requestId) {
+  const note = prompt('Reason for rejection:', 'Rejected by club.');
+  if (note === null) return;
+  try {
+    await apiPost('backend/clubs/reject_join_request.php', {
+      request_id: requestId,
+      club_note: note || 'Rejected by club.'
+    });
+    showToast('Club join request rejected', 'info');
+    await loadDashboardData();
+    switchTab('clubs');
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || 'Failed to reject request', 'error');
+  }
+}
+
+function renderProfile() {
+  document.getElementById('profAvatar').textContent = (user.name || 'U')[0].toUpperCase();
+  document.getElementById('profName').textContent = user.name || 'User';
+  document.getElementById('profRole').textContent = roleLabel(user.role);
+  document.getElementById('profEmail').textContent = user.email || '';
+  document.getElementById('editName').value = user.name || '';
+  document.getElementById('editEmail').value = user.email || '';
 }
 
 function saveProfile() {
-  const u = getCurrentUser();
-  u.name = document.getElementById('editName').value;
-  u.email = document.getElementById('editEmail').value;
-  setCurrentUser(u);
-  showToast('Profile updated!', 'success');
-  document.getElementById('profName').textContent = u.name;
-  document.getElementById('profEmail').textContent = u.email;
+  const updated = { ...user };
+  updated.name = document.getElementById('editName').value.trim() || user.name;
+  updated.full_name = updated.name;
+  updated.email = document.getElementById('editEmail').value.trim() || user.email;
+
+  user = updated;
+  setCurrentUser(updated);
+  renderProfile();
+  renderSidebarProfile();
+  renderNavUser();
+  showToast('Profile updated locally. Database profile update will be added later.', 'info');
 }
 
-// Tabs
 function switchTab(name) {
-  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('show'));
   document.getElementById('dash' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('show');
-  document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(a=>{a.classList.remove('active');if(a.dataset.tab===name)a.classList.add('active');});
+  document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(a => {
+    a.classList.remove('active');
+    if (a.dataset.tab === name) a.classList.add('active');
+  });
 }
-document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();switchTab(a.dataset.tab);}));
 
-// Booking filter tabs
-document.querySelectorAll('[data-bfilter]').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('[data-bfilter]').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const f=btn.dataset.bfilter;
-    const filtered=f==='all'?bookings:bookings.filter(b=>b.status===f);
-    document.getElementById('bookingsList').innerHTML=filtered.length?filtered.map(renderBookingRow).join(''):'<div class="empty-state"><i class="bi bi-inbox"></i><p>No bookings with this status</p></div>';
+document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    switchTab(a.dataset.tab);
   });
 });
+
+document.querySelectorAll('[data-bfilter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-bfilter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentBookingFilter = btn.dataset.bfilter;
+    renderBookings();
+  });
+});
+
+loadDashboardData();
+
 </script>
 </body>
 </html>

@@ -173,6 +173,13 @@
       white-space:nowrap;
     }
 
+    .club-btn:disabled{
+      opacity:0.68;
+      cursor:not-allowed;
+      transform:none !important;
+      box-shadow:none !important;
+    }
+
     .club-btn-view{
       background:rgba(255,255,255,0.04);
       color:var(--text-secondary);
@@ -331,168 +338,182 @@
 <script src="global.js"></script>
 
 <script>
-const CLUBS = [
-  {
-    id:1,
-    name:'Computer Science Club',
-    category:'Technology',
-    icon:'💻',
-    color:'rgba(139,92,246,0.2)',
-    members:142,
-    events:8,
-    img:'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&q=80',
-    desc:'Fostering innovation and technical skills through workshops, hackathons, and coding challenges.'
-  },
-  {
-    id:2,
-    name:'Engineering Innovation Club',
-    category:'Engineering',
-    icon:'⚙️',
-    color:'rgba(201,168,76,0.2)',
-    members:98,
-    events:5,
-    img:'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80',
-    desc:'Bridging theoretical knowledge with real-world applications through hands-on engineering projects.'
-  },
-  {
-    id:3,
-    name:'Cultural Heritage Society',
-    category:'Culture',
-    icon:'🏺',
-    color:'rgba(244,114,182,0.2)',
-    members:215,
-    events:12,
-    img:'https://images.unsplash.com/photo-1541535650810-10d26f5c2ab3?w=600&q=80',
-    desc:'Celebrating and preserving Palestinian and Arab cultural heritage through arts, exhibitions, and events.'
-  },
-  {
-    id:4,
-    name:'Business & Entrepreneurship Club',
-    category:'Business',
-    icon:'📈',
-    color:'rgba(52,211,153,0.2)',
-    members:176,
-    events:9,
-    img:'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600&q=80',
-    desc:'Empowering student entrepreneurs with mentorship, pitch competitions, and startup resources.'
-  },
-  {
-    id:5,
-    name:'Environmental Action Group',
-    category:'Environment',
-    icon:'🌿',
-    color:'rgba(52,211,153,0.15)',
-    members:87,
-    events:6,
-    img:'https://images.unsplash.com/photo-1569163139500-9b7e13aebbdb?w=600&q=80',
-    desc:'Driving sustainability initiatives and environmental awareness on campus and beyond.'
-  },
-  {
-    id:6,
-    name:'Photography & Media Club',
-    category:'Arts',
-    icon:'📷',
-    color:'rgba(251,191,36,0.15)',
-    members:63,
-    events:4,
-    img:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80',
-    desc:'Exploring visual storytelling through photography, videography, and digital media creation.'
-  },
-  {
-    id:7,
-    name:'Medical Students Society',
-    category:'Health',
-    icon:'⚕️',
-    color:'rgba(248,113,113,0.15)',
-    members:194,
-    events:7,
-    img:'https://images.unsplash.com/photo-1576671081837-49000212a370?w=600&q=80',
-    desc:'Supporting medical students with study groups, clinical skill workshops, and community health drives.'
-  },
-  {
-    id:8,
-    name:'Chess & Strategy Club',
-    category:'Sports',
-    icon:'♟️',
-    color:'rgba(139,92,246,0.15)',
-    members:45,
-    events:3,
-    img:'https://images.unsplash.com/photo-1580541832626-2a7131ee809f?w=600&q=80',
-    desc:'Sharpening minds through chess tournaments, strategy games, and analytical thinking sessions.'
-  }
-];
-
-const CATS = ['All', ...new Set(CLUBS.map(c => c.category))];
+let CLUBS = [];
 let activeCat = 'All';
+let selectedClub = null;
 
-document.getElementById('catBar').innerHTML = CATS.map(c => `
-  <button class="cat-pill${c === 'All' ? ' active' : ''}" data-c="${c}">
-    ${c}
-  </button>
-`).join('');
+const joinModal = new bootstrap.Modal(document.getElementById('joinModal'));
+const catBar = document.getElementById('catBar');
+const clubSearch = document.getElementById('clubSearch');
+const clubCount = document.getElementById('clubCount');
+const clubsGrid = document.getElementById('clubsGrid');
+const clubsEmpty = document.getElementById('clubsEmpty');
+const joinConfirmBtn = document.getElementById('joinConfirm');
+let PHP_USER = null;
 
-document.querySelectorAll('#catBar .cat-pill').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#catBar .cat-pill').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeCat = btn.dataset.c;
+async function refreshPhpUser() {
+  try {
+    const response = await fetch('backend/auth/me.php', { credentials: 'same-origin' });
+    const result = await response.json();
+    PHP_USER = result.success ? result.data.user : null;
+    console.log('PHP session user:', PHP_USER);
+    return PHP_USER;
+  } catch (error) {
+    console.error('Could not check PHP session:', error);
+    PHP_USER = null;
+    return null;
+  }
+}
+
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  }[ch]));
+}
+
+async function loadClubs() {
+  clubsGrid.innerHTML = `
+    <div class="col-12">
+      <div class="empty-state" style="display:block;">
+        <i class="bi bi-hourglass-split"></i>
+        <h5 style="font-family:var(--font-display);color:var(--text-secondary);">Loading clubs...</h5>
+        <p>Please wait while we load clubs from the database.</p>
+      </div>
+    </div>
+  `;
+
+  try {
+    const response = await fetch('backend/clubs/get_clubs.php', { credentials: 'same-origin' });
+    const result = await response.json();
+
+    if (!result.success) {
+      showToast(result.message || 'Failed to load clubs', 'error');
+      CLUBS = [];
+    } else {
+      CLUBS = result.data.clubs || [];
+    }
+
+    buildCategoryBar();
     renderClubs();
-  });
+  } catch (error) {
+    console.error('Load clubs error:', error);
+    CLUBS = [];
+    buildCategoryBar();
+    renderClubs();
+    showToast('Connection error while loading clubs', 'error');
+  }
+}
+
+function buildCategoryBar() {
+  const cats = ['All', ...new Set(CLUBS.map(c => c.category).filter(Boolean))];
+
+  if (!cats.includes(activeCat)) {
+    activeCat = 'All';
+  }
+
+  catBar.innerHTML = cats.map(c => `
+    <button class="cat-pill${c === activeCat ? ' active' : ''}" data-c="${escapeHTML(c)}">
+      ${escapeHTML(c)}
+    </button>
+  `).join('');
+}
+
+catBar.addEventListener('click', e => {
+  const btn = e.target.closest('.cat-pill');
+  if (!btn) return;
+
+  document.querySelectorAll('#catBar .cat-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeCat = btn.dataset.c;
+  renderClubs();
 });
 
-document.getElementById('clubSearch').addEventListener('input', renderClubs);
+clubSearch.addEventListener('input', renderClubs);
+
+function getJoinButton(c) {
+  const status = c.join_status || 'none';
+
+  if (status === 'member' || status === 'approved') {
+    return `
+      <button class="club-btn club-btn-join" disabled>
+        <i class="bi bi-check2-circle"></i>
+        <span>Member</span>
+      </button>
+    `;
+  }
+
+  if (status === 'pending') {
+    return `
+      <button class="club-btn club-btn-join" disabled>
+        <i class="bi bi-hourglass-split"></i>
+        <span>Pending</span>
+      </button>
+    `;
+  }
+
+  const label = status === 'rejected' ? 'Join Again' : 'Join';
+
+  return `
+    <button class="club-btn club-btn-join" onclick="joinClub(${Number(c.id)})">
+      <i class="bi bi-person-plus"></i>
+      <span>${label}</span>
+    </button>
+  `;
+}
 
 function renderClubs() {
-  const q = document.getElementById('clubSearch').value.trim().toLowerCase();
+  const q = clubSearch.value.trim().toLowerCase();
 
   const filtered = CLUBS.filter(c => {
     if (activeCat !== 'All' && c.category !== activeCat) return false;
-    if (q && !(c.name + c.category + c.desc).toLowerCase().includes(q)) return false;
+
+    const searchable = [c.name, c.category, c.desc].join(' ').toLowerCase();
+    if (q && !searchable.includes(q)) return false;
+
     return true;
   });
 
-  document.getElementById('clubCount').textContent =
-    filtered.length + ' club' + (filtered.length !== 1 ? 's' : '') + ' found';
+  clubCount.textContent = filtered.length + ' club' + (filtered.length !== 1 ? 's' : '') + ' found';
+  clubsEmpty.style.display = filtered.length ? 'none' : 'block';
 
-  document.getElementById('clubsEmpty').style.display = filtered.length ? 'none' : 'block';
-
-  document.getElementById('clubsGrid').innerHTML = filtered.map(c => `
+  clubsGrid.innerHTML = filtered.map(c => `
     <div class="col-sm-6 col-lg-4">
       <div class="club-card">
-        <div class="club-banner" style="background-image:url('${c.img}')">
-          <div class="club-avatar" style="background:${c.color};">${c.icon}</div>
+        <div class="club-banner" style="background-image:url('${escapeHTML(c.img || '')}')">
+          <div class="club-avatar" style="background:${escapeHTML(c.color || 'rgba(201,168,76,0.2)')};">${escapeHTML(c.icon || '🏛️')}</div>
         </div>
 
         <div class="club-body">
-          <div class="club-name">${c.name}</div>
+          <div class="club-name">${escapeHTML(c.name)}</div>
 
           <div class="club-category">
-            <span class="badge-gold" style="font-size:0.65rem;">${c.category}</span>
+            <span class="badge-gold" style="font-size:0.65rem;">${escapeHTML(c.category)}</span>
           </div>
 
-          <div class="club-desc">${c.desc}</div>
+          <div class="club-desc">${escapeHTML(c.desc)}</div>
 
           <div class="club-stats">
             <span>
               <i class="bi bi-people" style="color:var(--gold);"></i>
-              ${c.members} members
+              ${Number(c.members || 0).toLocaleString()} members
             </span>
             <span>
               <i class="bi bi-calendar3" style="color:var(--gold);"></i>
-              ${c.events} events
+              ${Number(c.events || 0).toLocaleString()} events
             </span>
           </div>
 
           <div class="club-actions">
-            <button class="club-btn club-btn-view" onclick="viewClub(${c.id})">
+            <button class="club-btn club-btn-view" onclick="viewClub(${Number(c.id)})">
               <i class="bi bi-eye"></i>
               <span>View</span>
             </button>
 
-            <button class="club-btn club-btn-join" onclick="joinClub(${c.id})">
-              <i class="bi bi-person-plus"></i>
-              <span>Join</span>
-            </button>
+            ${getJoinButton(c)}
           </div>
         </div>
       </div>
@@ -500,13 +521,10 @@ function renderClubs() {
   `).join('');
 }
 
-renderClubs();
-
-const joinModal = new bootstrap.Modal(document.getElementById('joinModal'));
-let selectedClub = null;
-
-function joinClub(id) {
-  const user = getCurrentUser();
+async function joinClub(id) {
+  const localUser = getCurrentUser();
+  const phpUser = await refreshPhpUser();
+  const user = phpUser || localUser;
 
   if (!user) {
     showToast('Please login to join clubs', 'info');
@@ -514,35 +532,120 @@ function joinClub(id) {
     return;
   }
 
-  selectedClub = CLUBS.find(c => c.id === id);
+  if ((user.role || '').toLowerCase() !== 'student') {
+    showToast('Only student accounts can send club join requests', 'error');
+    return;
+  }
+
+  if (!phpUser) {
+    showToast('Your PHP login session expired. Please login again.', 'error');
+    setTimeout(() => window.location.href = 'login.html', 1000);
+    return;
+  }
+
+  selectedClub = CLUBS.find(c => Number(c.id) === Number(id));
+
+  if (!selectedClub) {
+    showToast('Club not found', 'error');
+    return;
+  }
+
+  if (selectedClub.join_status === 'pending') {
+    showToast('You already have a pending request for this club', 'info');
+    return;
+  }
+
+  if (selectedClub.join_status === 'member' || selectedClub.join_status === 'approved') {
+    showToast('You are already a member of this club', 'info');
+    return;
+  }
 
   document.getElementById('joinTitle').textContent = 'Join ' + selectedClub.name;
-  document.getElementById('joinDesc').textContent = selectedClub.desc;
-
-  if (user) {
-    document.getElementById('joinName').value = user.name || '';
-  }
+  document.getElementById('joinDesc').textContent = selectedClub.desc || '';
+  document.getElementById('joinName').value = user.full_name || user.name || '';
+  document.getElementById('joinId').value = user.student_id || '';
+  document.getElementById('joinReason').value = '';
 
   joinModal.show();
 }
 
 function viewClub(id) {
-  const c = CLUBS.find(x => x.id === id);
-  showToast('Viewing: ' + c.name, 'info');
+  const c = CLUBS.find(x => Number(x.id) === Number(id));
+  if (!c) return;
+
+  showToast(c.name + ' — ' + Number(c.members || 0).toLocaleString() + ' members', 'info');
 }
 
-document.getElementById('joinConfirm').addEventListener('click', () => {
+joinConfirmBtn.addEventListener('click', async () => {
+  if (!selectedClub) return;
+
   const name = document.getElementById('joinName').value.trim();
   const sid = document.getElementById('joinId').value.trim();
+  const reason = document.getElementById('joinReason').value.trim();
 
-  if (!name || !sid) {
-    showToast('Please fill all fields', 'error');
+  if (!name) {
+    showToast('Please enter your name', 'error');
     return;
   }
 
-  joinModal.hide();
-  showToast('Request sent to ' + selectedClub.name + '! You\'ll be notified soon.', 'success');
+  joinConfirmBtn.disabled = true;
+  joinConfirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+
+  try {
+    const response = await fetch('backend/clubs/join_club.php', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        club_id: Number(selectedClub.id),
+        full_name: name,
+        student_id: sid,
+        reason: reason
+      })
+    });
+
+    const rawText = await response.text();
+    let result;
+
+    try {
+      result = JSON.parse(rawText);
+    } catch (parseError) {
+      console.error('Invalid JSON from join_club.php:', rawText);
+      showToast('PHP returned an invalid response. Check Console.', 'error');
+      return;
+    }
+
+    if (!result.success) {
+      console.warn('Join club failed:', result);
+
+      if (response.status === 401) {
+        showToast('Login session expired. Please login again.', 'error');
+        setTimeout(() => window.location.href = 'login.html', 900);
+        return;
+      }
+
+      alert(result.message || 'Failed to send request. Check Console.');
+      showToast(result.message || 'Failed to send request', 'error');
+      return;
+    }
+
+    selectedClub.join_status = 'pending';
+    renderClubs();
+    joinModal.hide();
+    showToast('Request sent to ' + selectedClub.name + '! Request ID: ' + (result.data?.request?.request_id || 'created'), 'success');
+
+  } catch (error) {
+    console.error('Join club error:', error);
+    showToast('Connection error while sending request', 'error');
+  } finally {
+    joinConfirmBtn.disabled = false;
+    joinConfirmBtn.innerHTML = '<i class="bi bi-check2 me-1"></i>Submit Request';
+  }
 });
+
+refreshPhpUser().then(loadClubs);
 </script>
 
 </body>

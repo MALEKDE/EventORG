@@ -175,8 +175,26 @@ function showToast(msg,type='success'){
 }
 
 /* ── Auth ── */
+function normalizeRole(role){return String(role || '').trim().toLowerCase();}
 function getCurrentUser(){try{return JSON.parse(localStorage.getItem('najah_user')||'null');}catch{return null;}}
-function setCurrentUser(u){localStorage.setItem('najah_user',JSON.stringify(u));}
+function setCurrentUser(u){
+  if (u && u.role) u.role = normalizeRole(u.role);
+  localStorage.setItem('najah_user',JSON.stringify(u));
+}
+function replaceTextInElement(el, from, to){
+  const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);
+  const nodes=[];
+  while(walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n=>{n.nodeValue=n.nodeValue.replaceAll(from,to);});
+}
+function rewriteRoleLinks(){
+  const user=getCurrentUser();
+  if(!user || normalizeRole(user.role)!=='admin') return;
+  document.querySelectorAll('a[href="dashboard.html"],a[href="./dashboard.html"]').forEach(a=>{
+    a.setAttribute('href','admin.html');
+    replaceTextInElement(a,'Dashboard','Admin Panel');
+  });
+}
 function logout(){
   fetch('backend/auth/logout.php',{method:'POST'}).catch(()=>{}).finally(()=>{
     localStorage.removeItem('najah_user');
@@ -188,8 +206,32 @@ function logout(){
 function renderNavUser() {
   const user=getCurrentUser(), slot=document.getElementById('navUserSlot'); if(!slot) return;
   const tog=buildThemeToggle();
+
   if(user){
-    slot.innerHTML=tog+`<li class="nav-item dropdown ms-lg-1"><a class="btn-ghost d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown" style="padding:0.4rem 0.85rem;"><span class="nav-avatar">${(user.name||'U')[0].toUpperCase()}</span><span class="d-none d-lg-inline" style="font-size:.85rem;color:var(--text-secondary);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${user.name||'User'}</span><i class="bi bi-chevron-down" style="font-size:.65rem;color:var(--text-muted);"></i></a><ul class="dropdown-menu dropdown-menu-end" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);min-width:190px;padding:.5rem;box-shadow:var(--shadow-deep);"><li><a class="dropdown-item" href="dashboard.html" style="color:var(--text-secondary);font-size:.85rem;padding:.6rem 1rem;border-radius:var(--radius-sm);display:flex;align-items:center;gap:.6rem;"><i class="bi bi-grid"></i> Dashboard</a></li>${user.role==='admin'?'<li><a class="dropdown-item" href="admin.html" style="color:var(--text-secondary);font-size:.85rem;padding:.6rem 1rem;border-radius:var(--radius-sm);display:flex;align-items:center;gap:.6rem;"><i class="bi bi-shield-check"></i> Admin Panel</a></li>':''}<li><hr class="dropdown-divider" style="border-color:var(--border-subtle);margin:.35rem 0;"></li><li><a class="dropdown-item" href="#" onclick="logout()" style="color:#ef4444;font-size:.85rem;padding:.6rem 1rem;border-radius:var(--radius-sm);display:flex;align-items:center;gap:.6rem;"><i class="bi bi-box-arrow-right"></i> Logout</a></li></ul></li>`;
+    const displayName = user.name || user.full_name || 'User';
+    const firstLetter = displayName.charAt(0).toUpperCase();
+
+    const adminOnlyMenu = `
+      <li><a class="dropdown-item" href="admin.html" style="color:var(--text-secondary);font-size:.85rem;padding:.6rem 1rem;border-radius:var(--radius-sm);display:flex;align-items:center;gap:.6rem;"><i class="bi bi-shield-check"></i> Admin Panel</a></li>`;
+
+    const userMenu = `
+      <li><a class="dropdown-item" href="dashboard.html" style="color:var(--text-secondary);font-size:.85rem;padding:.6rem 1rem;border-radius:var(--radius-sm);display:flex;align-items:center;gap:.6rem;"><i class="bi bi-grid"></i> Dashboard</a></li>`;
+
+    const roleMenu = normalizeRole(user.role) === 'admin' ? adminOnlyMenu : userMenu;
+
+    slot.innerHTML=tog+`
+      <li class="nav-item dropdown ms-lg-1">
+        <a class="btn-ghost d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown" style="padding:0.4rem 0.85rem;">
+          <span class="nav-avatar">${firstLetter}</span>
+          <span class="d-none d-lg-inline" style="font-size:.85rem;color:var(--text-secondary);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${displayName}</span>
+          <i class="bi bi-chevron-down" style="font-size:.65rem;color:var(--text-muted);"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);min-width:190px;padding:.5rem;box-shadow:var(--shadow-deep);">
+          ${roleMenu}
+          <li><hr class="dropdown-divider" style="border-color:var(--border-subtle);margin:.35rem 0;"></li>
+          <li><a class="dropdown-item" href="#" onclick="logout()" style="color:#ef4444;font-size:.85rem;padding:.6rem 1rem;border-radius:var(--radius-sm);display:flex;align-items:center;gap:.6rem;"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+        </ul>
+      </li>`;
   } else {
     slot.innerHTML=tog+`<li class="nav-item ms-lg-1"><a class="btn-outline-gold" href="login.html" style="padding:.42rem 1.1rem;font-size:.82rem;">Login</a></li><li class="nav-item ms-lg-1"><a class="btn-gold" href="register.html" style="padding:.42rem 1.1rem;font-size:.82rem;" data-magnetic>Sign Up</a></li>`;
   }
@@ -197,7 +239,7 @@ function renderNavUser() {
 
 document.addEventListener('DOMContentLoaded',()=>{
   applyTheme(getTheme(),false);
-  initCounters(); initScrollReveal(); renderNavUser();
+  initCounters(); initScrollReveal(); renderNavUser(); rewriteRoleLinks();
   initCursor(); initMagnetic(); initTilt();
   initScramble(); initParallax(); initMarquee();
   initWordReveal(); initHeroCanvas(); initPreloader();
